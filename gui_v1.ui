@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1000</width>
+    <height>750</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1000</width>
+    <height>750</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>1400</width>
+    <height>960</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>AP AT Assistant</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>Icon_1.jpg</normaloff>Icon_1.jpg</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QTabWidget" name="treeView_tabWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>301</width>
+      <height>671</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>1</number>
+    </property>
+    <widget class="QWidget" name="student_tree_tab">
+     <attribute name="title">
+      <string>Student Files</string>
+     </attribute>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QTreeView" name="studentsFiles_treeView"/>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="test_tree_tab">
+     <attribute name="title">
+      <string>Test Files</string>
+     </attribute>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QTreeView" name="testFiles_treeView"/>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1000</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="action_open_students_file"/>
+    <addaction name="action_open_test_file"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="action_setting"/>
+    <addaction name="action_preference"/>
+   </widget>
+   <widget class="QMenu" name="menuhelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="action_user_guide"/>
+    <addaction name="action_about"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuhelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="action_setting">
+   <property name="text">
+    <string>Setting</string>
+   </property>
+  </action>
+  <action name="action_preference">
+   <property name="text">
+    <string>Preference</string>
+   </property>
+  </action>
+  <action name="action_open_students_file">
+   <property name="text">
+    <string>Open Students File</string>
+   </property>
+  </action>
+  <action name="action_open_test_file">
+   <property name="text">
+    <string>Open Test File</string>
+   </property>
+  </action>
+  <action name="action_user_guide">
+   <property name="text">
+    <string>User Guide</string>
+   </property>
+  </action>
+  <action name="action_about">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
