@@ -12,14 +12,9 @@ def create_tree(s, l, makefile_path, googletest_path, dockerfile_path, main_path
     os.chdir(aphwpath)
     # i=0
     for student in os.listdir(aphwpath):
-        # i+=1
         Path(str(hwpath) + f'\hw\{student}').mkdir(parents = True, exist_ok=True)   #stu
-    # i=0
-    # print(os.listdir(aphwpath))
     aphw_pathlist = os.listdir(aphwpath)        #name of files in aphw1 folder
     for student in aphw_pathlist:
-        # i+=1
-        # print(student)
         for ans in os.listdir(student):
             path = os.path.abspath(student)+f'\{ans}' 
             if(zipfile.is_zipfile(path)):
@@ -28,23 +23,11 @@ def create_tree(s, l, makefile_path, googletest_path, dockerfile_path, main_path
                     zip_ref.extractall(str(hwpath) + f'\hw\{student}\CPlusPlus\{ans[:-4]}')#stu
 
     os.chdir(str(hwpath)+r'\hw')
-    # print(os.getcwd())
     for student in os.listdir(os.path.abspath(os.getcwd())):
-        # print(student)
-        # print(3)
         for ans in os.listdir(os.path.abspath(student)):
-            # i=0
-            # print(str(hwpath)+'\hw'+f'\{student}'+f'\{ans}')
-            # print(student)
-            # print(ans)
             create_floder(str(hwpath)+r'\hw'+f'\{student}'+f'\{ans}', l, makefile_path, googletest_path, dockerfile_path, main_path)
-        # print(3)
-        # print(os.getcwd())
-    
 
 def create_floder(s, list_name, makefile_path, googletest_path, dockerfile_path, main_path):
-    # print(s)
-    # print(5)
     current_dir = os.path.abspath(os.getcwd())
     os.chdir(s)
     first_folder = os.listdir(os.getcwd())
@@ -65,47 +48,26 @@ def create_floder(s, list_name, makefile_path, googletest_path, dockerfile_path,
             answer.append((p1,p2))
         temp = answer.copy()
         for i in range(2,len(vals)):
-            # print(i)
             answer.clear()
             for p1,p2 in itertools.product(temp,vals[i]):
                 answer.append((*p1,p2))
                 temp = answer.copy()
         
-        #answer is a list of jaygasht ha! :))
-        # first_folder = os.listdir(os.getcwd())
-        # first_dir = os.getcwd()
-        # print(first_folder)
         for folder in first_folder:
-            # print(len(answer))
             for i in range(len(answer)):
-                # print(Path(os.getcwd()).parent)
                 path_folder = first_dir + f'\Answer_{folder}' + f'\{folder}_{i+1}'
                 Path(path_folder).mkdir(parents=True, exist_ok=True)
-                # print(path_folder)
                 Path(path_folder+r'\cpp').mkdir(parents=True, exist_ok=True)
                 Path(path_folder+r'\h').mkdir(parents=True, exist_ok=True)
                 for file in answer[i]:
-                    # makefile_path, googletest_path, dockerfile_path
                     shutil.copy(makefile_path, path_folder)
                     shutil.copy(googletest_path, path_folder)
                     shutil.copy(dockerfile_path, path_folder)
                     shutil.copy(main_path, path_folder+r'\cpp')
                     if(str(file)[-4:]=='.cpp'):
-                        # print(2)
                         shutil.copy(file, path_folder+r'\cpp')
                     else:
                         shutil.copy(file, path_folder+r'\h')
-
-    # print(os.getcwd())
-    # print(7)
-    # os.chdir(str(Path(os.getcwd()).parent))
-    # for folder in os.listdir(os.getcwd()):
-    #     # print(folder)
-    #     for first in first_folder:
-    #         if folder == first:
-    #             # print(1)
-    #             shutil.rmtree(folder, ignore_errors=True)
-
     os.chdir(current_dir)           
     
 
