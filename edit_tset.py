@@ -25,31 +25,21 @@ def comment(s):
 
     return test_list
 
-def grade(s, test_list):
-    os.chdir(s)
-    print(s)
-    os.system('docker stop hw1')
-    ans = os.popen('docker build -t ap1398/hw1 .').read()   ##12/12 ...
-    write = open('aphw1_unittest.cpp','w')
-    write.write(test_list[-1][0])
 
-    if( ans.find('returned a non-zero code')):
-        print('Erorrrr')
-    else:
-        img = os.popen('docker run --rm ap1398/hw1').read()     ##khoroji ./main docker
+#--DEBUGGING--
+# def grade(s, test_list):
+#     os.chdir(s)
+#     print(s)
+#     os.system('docker stop hw1')
+#     ans = os.popen('docker build -t ap1398/hw1 .').read()   ##12/12 ...
+#     write = open('aphw1_unittest.cpp','w')
+#     write.write(test_list[-1][0])
 
-    #     img = os.popen('docker run --rm ap1398/hw1').read()     ##khoroji ./main docker
-    #     print('succes')
-    #     for test in test_list:
-    #         # write = open('aphw1_unittest.cpp','w')
-    #         write.write(test[0])
-    #         ans = os.popen('docker build -t ap1398/hw1 .').read()   ##12/12 ...
-    #         if( ans.find('returned a non-zero code')):
-    #             print('Erorrrr')
-    #         else:
-    #             img = os.popen('docker run --rm ap1398/hw1').read()     ##khoroji ./main docker
-    #             print('succes')
-    # print(ans)
+#     if( ans.find('returned a non-zero code')):
+#         print('Erorrrr')
+#     else:
+#         img = os.popen('docker run --rm ap1398/hw1').read()     ##khoroji ./main docker
+
 
 if __name__ == "__main__":
     # os.chdir('desktop\cplusplus\Answer_MohammadMahdiShojaefar9623065\MohammadMahdiShojaefar9623065_1')
