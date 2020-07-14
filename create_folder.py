@@ -81,8 +81,7 @@ def create_floder(s, list_name, makefile_path, googletest_path, dockerfile_path,
                     shutil.copy(file, path_folder+r'\cpp')
                 elif str(file)[-2:]=='.h':
                     shutil.copy(file, path_folder+r'\h')
-    os.chdir(current_dir)           
-    
+    os.chdir(current_dir)
 
 if __name__ == "__main__":
     l = ['aphw1.cpp','aphw1.h']
