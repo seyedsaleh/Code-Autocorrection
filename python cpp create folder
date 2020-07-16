@@ -133,10 +133,6 @@ def create_floder(s, lan, list_name, makefile_path, googletest_path, dockerfile_
     
 
 if __name__ == "__main__":
-    # l = ['aphw1.cpp','aphw1.h','main.cpp']
-    # print(os.getcwd())
-    # s = os.getcwd()+'\desktop\zip'
-    # create_floder(s,l)
     l = ['aphw1.cpp','aphw1.h','tset.py']
     makefile_path = r'C:\Users\edr\Desktop\ta\Makefile'
     googletest_path = r'C:\Users\edr\Desktop\ta\aphw1_unittest.cpp'
@@ -144,11 +140,6 @@ if __name__ == "__main__":
     main_path = r'C:\Users\edr\Desktop\ta\main.cpp'
     dataset_list = [r'C:\Users\edr\Desktop\ta\AP-Data.csv']
     create_tree(r'C:\Users\edr\desktop\grading\APHW', l, makefile_path, googletest_path, dockerfile_path, main_path, dataset_list)
-    # print(os.getcwd())
-    # shutil.rmtree(os.getcwd(), ignore_errors = True)
-    # l1 = ['a','b','c']
-    # l2 = [3,5,]
-    # l3 = ['+']
-    # create_floder(l1,l1,l2,l3)
+   
 
 
