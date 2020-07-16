@@ -100,7 +100,6 @@ def create_floder(s, lan, list_name, folder_path):
                     elif str(file)[-2:]=='.h':
                         shutil.copy(file, path_folder+r'\h')
         if lan == 'python':
-            print(answer,list_name)
             for i in range(len(answer)):
                 path_folder = first_dir + f'\Answer_{sub}' + f'\{sub}_{i+1}'#folder
                 Path(path_folder).mkdir(parents=True, exist_ok=True)
