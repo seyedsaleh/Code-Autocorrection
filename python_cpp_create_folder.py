@@ -45,7 +45,6 @@ def create_tree(s, l, cppfolder, pythonfolder):        #l is a list consist of n
             if ans == 'CPlusPlus':
                 create_floder(str(hwpath)+r'\hw'+f'\{student}'+f'\{ans}', 'cpp', cppfilelist, cppfolder)
             if ans == 'Python':
-                # print("yyyy")
                 create_floder(str(hwpath)+r'\hw'+f'\{student}'+f'\{ans}', 'python', pythonfilelist, pythonfolder)
 
 def create_floder(s, lan, list_name, folder_path):
@@ -94,9 +93,9 @@ def create_floder(s, lan, list_name, folder_path):
                 for file in answer[i]:
                     # makefile_path, googletest_path, dockerfile_path
                     for dataset in os.listdir(folder_path):
-                        if dataset[-4:] == '.csv':
+                        if dataset[-4:] == '.csv':                          #find and copy dataset files
                             shutil.copy(folder_path + f'\{dataset}', path_folder)
-                    shutil.copy(folder_path + r'\Makefile', path_folder)
+                    shutil.copy(folder_path + r'\Makefile', path_folder)    #find and copy other files
                     shutil.copy(folder_path + r'\Dockerfile', path_folder)
                     shutil.copy(folder_path + r'\aphw1_unittest.cpp', path_folder+r'\cpp')
                     shutil.copy(folder_path + r'\main.cpp', path_folder+r'\cpp')
@@ -112,16 +111,15 @@ def create_floder(s, lan, list_name, folder_path):
                 for file in answer[i]:
                     # makefile_path, googletest_path, dockerfile_path
                     for dataset in os.listdir(folder_path):
-                        if dataset[-4:] == '.csv':
+                        if dataset[-4:] == '.csv':                          #find and copy dataset files
                             shutil.copy(folder_path + f'\{dataset}', path_folder)
-                    shutil.copy(folder_path + r'\Makefile', path_folder)
+                    shutil.copy(folder_path + r'\Makefile', path_folder)    #find and copy other files
                     shutil.copy(folder_path + r'\Dockerfile', path_folder)
                     shutil.copy(folder_path + r'\aphw1_unittest.cpp', path_folder)
                     shutil.copy(folder_path + r'\requirements.txt', path_folder)
                     shutil.copy(file, path_folder)
     os.chdir(current_dir)           
     
-
 if __name__ == "__main__":
     # l = ['aphw1.cpp','aphw1.h','main.cpp']
     # print(os.getcwd())
