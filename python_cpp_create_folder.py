@@ -17,7 +17,6 @@ def create_tree(s, l, cppfolder, pythonfolder):        #l is a list consist of n
         if filename[-2:]=='.h' or filename[-4:]=='.hpp' or filename[-4:]=='.cpp':
             iscpp = True
             cppfilelist.append(filename)
-    # print(cppfilelist,pythonfilelist)
     aphwpath = os.path.abspath(s)                                       #apwh_i path
     hwpath = Path(os.path.abspath(aphwpath)).parent                     #our folder path(named hw)
     Path(str(hwpath) + r'\hw').mkdir(parents = True, exist_ok=True)     #create hw in parent of aphw1
@@ -68,21 +67,18 @@ def create_floder(s, lan, list_name, folder_path):
                                                                         #                      [aphw1.cpp path1, aphw1.h path2]]
         if len(list(dict.keys())) == 1 :
             answer = list(map(lambda el:[el], list(dict.values())[0]))
-            # answer = list(dict.values())
-
         #calculate all state
         if len(list(dict.keys())) > 1 :
             for p1,p2 in itertools.product(vals[0],vals[1]):
                 answer.append((p1,p2))
         temp = answer.copy()
         for i in range(2,len(vals)):
-            # print(i)
             answer.clear()
             for p1,p2 in itertools.product(temp,vals[i]):
                 answer.append((*p1,p2))
                 temp = answer.copy()
         
-        # for each sub in first_folder:
+        #for each sub in first_folder:
         #create some folders for grading easier
         if lan == 'cpp':
             for i in range(len(answer)):
@@ -91,7 +87,7 @@ def create_floder(s, lan, list_name, folder_path):
                 Path(path_folder+r'\cpp').mkdir(parents=True, exist_ok=True)
                 Path(path_folder+r'\h').mkdir(parents=True, exist_ok=True)
                 for file in answer[i]:
-                    # makefile_path, googletest_path, dockerfile_path
+                    #makefile_path, googletest_path, dockerfile_path
                     for dataset in os.listdir(folder_path):
                         if dataset[-4:] == '.csv':                          #find and copy dataset files
                             shutil.copy(folder_path + f'\{dataset}', path_folder)
@@ -109,7 +105,7 @@ def create_floder(s, lan, list_name, folder_path):
                 path_folder = first_dir + f'\Answer_{sub}' + f'\{sub}_{i+1}'#folder
                 Path(path_folder).mkdir(parents=True, exist_ok=True)
                 for file in answer[i]:
-                    # makefile_path, googletest_path, dockerfile_path
+                    #makefile_path, googletest_path, dockerfile_path
                     for dataset in os.listdir(folder_path):
                         if dataset[-4:] == '.csv':                          #find and copy dataset files
                             shutil.copy(folder_path + f'\{dataset}', path_folder)
@@ -121,22 +117,7 @@ def create_floder(s, lan, list_name, folder_path):
     os.chdir(current_dir)           
     
 if __name__ == "__main__":
-    # l = ['aphw1.cpp','aphw1.h','main.cpp']
-    # print(os.getcwd())
-    # s = os.getcwd()+'\desktop\zip'
-    # create_floder(s,l)
     l = ['aphw1.cpp','aphw1.h','tset.py']
-    # makefile_path = r'C:\Users\edr\Desktop\ta\Makefile'
-    # googletest_path = r'C:\Users\edr\Desktop\ta\aphw1_unittest.cpp'
-    # dockerfile_path = r'C:\Users\edr\Desktop\ta\Dockerfile'
-    # main_path = r'C:\Users\edr\Desktop\ta\main.cpp'
-    # dataset_list = [r'C:\Users\edr\Desktop\ta\AP-Data.csv']
     folder = r'C:\Users\edr\Desktop\ta'
     folder2 = r'C:\Users\edr\Desktop\ta1'
     create_tree(r'C:\Users\edr\desktop\grading\APHW', l, folder, folder2)
-    # print(os.getcwd())
-    # shutil.rmtree(os.getcwd(), ignore_errors = True)
-    # l1 = ['a','b','c']
-    # l2 = [3,5,]
-    # l3 = ['+']
-    # create_floder(l1,l1,l2,l3)
