@@ -5,7 +5,7 @@ import zipfile
 import itertools
 from pathlib import Path
 
-def create_tree(s, l, cppfolder, pythonfolder):        #l is a list consist of name of files
+def create_tree(s, l, cppfolder, pythonfolder):                         #l is a list consist of name of files
     ispython = False
     iscpp = False
     pythonfilelist = []
@@ -17,6 +17,7 @@ def create_tree(s, l, cppfolder, pythonfolder):        #l is a list consist of n
         if filename[-2:]=='.h' or filename[-4:]=='.hpp' or filename[-4:]=='.cpp':
             iscpp = True
             cppfilelist.append(filename)
+            
     aphwpath = os.path.abspath(s)                                       #apwh_i path
     hwpath = Path(os.path.abspath(aphwpath)).parent                     #our folder path(named hw)
     Path(str(hwpath) + r'\hw').mkdir(parents = True, exist_ok=True)     #create hw in parent of aphw1
@@ -60,13 +61,15 @@ def create_floder(s, lan, list_name, folder_path):
                     if file == name:
                         path = os.path.join(root, file)
                         dict.setdefault(name, []).append(path)
-        vals = dict.values()
+        vals = list(dict.values())
+        vals = check(vals)
         vals = sorted(vals, key = lambda x:len(x))[::-1]                #sort dict according to the paths list
         answer = []                                                     #answer is a list of jaygasht ha! :))
                                                                         #ex for final result: [[aphw1.cpp path1, aphw1.h path1]
                                                                         #                      [aphw1.cpp path1, aphw1.h path2]]
         if len(list(dict.keys())) == 1 :
             answer = list(map(lambda el:[el], list(dict.values())[0]))
+
         #calculate all state
         if len(list(dict.keys())) > 1 :
             for p1,p2 in itertools.product(vals[0],vals[1]):
@@ -87,7 +90,7 @@ def create_floder(s, lan, list_name, folder_path):
                 Path(path_folder+r'\cpp').mkdir(parents=True, exist_ok=True)
                 Path(path_folder+r'\h').mkdir(parents=True, exist_ok=True)
                 for file in answer[i]:
-                    #makefile_path, googletest_path, dockerfile_path
+                    # makefile_path, googletest_path, dockerfile_path
                     for dataset in os.listdir(folder_path):
                         if dataset[-4:] == '.csv':                          #find and copy dataset files
                             shutil.copy(folder_path + f'\{dataset}', path_folder)
@@ -104,7 +107,7 @@ def create_floder(s, lan, list_name, folder_path):
                 path_folder = first_dir + f'\Answer_{sub}' + f'\{sub}_{i+1}'#folder
                 Path(path_folder).mkdir(parents=True, exist_ok=True)
                 for file in answer[i]:
-                    #makefile_path, googletest_path, dockerfile_path
+                    # makefile_path, googletest_path, dockerfile_path
                     for dataset in os.listdir(folder_path):
                         if dataset[-4:] == '.csv':                          #find and copy dataset files
                             shutil.copy(folder_path + f'\{dataset}', path_folder)
@@ -115,8 +118,30 @@ def create_floder(s, lan, list_name, folder_path):
                     shutil.copy(file, path_folder)
     os.chdir(current_dir)           
     
+def check(vals):                                        #get a list and convert the list to unique-list
+    current_path = os.path.abspath(os.getcwd())
+    # print(vals)
+    output = []
+    #finding same files
+    for li in vals:
+        temp = []
+        tempcode = []
+        licode = []
+        for path in li:
+            with open(path, 'r') as reader:
+                code = reader.read()
+            licode.append(code)
+        for i in range(len(li)):
+            if licode[i] not in tempcode:
+                tempcode.append(licode[i])
+                temp.append(li[i])
+        output.append(temp)
+    # print(output)
+    os.chdir(current_path)
+    return output
+
 if __name__ == "__main__":
-    l = ['aphw1.cpp','aphw1.h','tset.py']
+    l = ['aphw1.cpp','aphw1.h']
     folder = r'C:\Users\edr\Desktop\ta'
     folder2 = r'C:\Users\edr\Desktop\ta1'
-    create_tree(r'C:\Users\edr\desktop\grading\APHW', l, folder, folder2)
+    create_tree(r'C:\Users\edr\desktop\grading\APHW1', l, folder, folder2)
