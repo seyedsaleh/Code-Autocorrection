@@ -56,7 +56,7 @@ class directory():
                 if ans == 'Python':
                     self.create_floder(str(hwpath)+r'\hw'+f'\{student}'+f'\{ans}', 'python', pythonfilelist, pythonfolder)
 
-    def create_floder(s, lan, list_name, folder_path):
+    def create_floder(self, s, lan, list_name, folder_path):
         current_dir = os.path.abspath(os.getcwd())                          #the path that we come from to this function
         os.chdir(s)                                                         #hw\sub\CPlsPlus or Python
         first_folder = os.listdir(os.getcwd())                              #list of folder in CPlusPlus, actually the subs are in this folder
@@ -122,7 +122,7 @@ class directory():
                         shutil.copy(file, path_folder)
         os.chdir(current_dir)           
 
-    def check(vals):                                                        #get a list and convert the list to unique-list
+    def check(self, vals):                                                        #get a list and convert the list to unique-list
         current_path = os.path.abspath(os.getcwd())
         output = []
         #finding same files
@@ -142,7 +142,7 @@ class directory():
         os.chdir(current_path)
         return output
 
-    def start():
+    def start(self):
         aphwzippath = os.path.abspath(self.aphwfolderpath)
         aphwpath = Path(str(Path(os.path.abspath(aphwzippath)).parent) + r'\aphw')
         hwpath = Path(str(Path(os.path.abspath(aphwzippath)).parent) + r'\hw')
@@ -155,10 +155,10 @@ class directory():
                 Path(aphwpath).mkdir(parents = True, exist_ok=True)
                 zip_ref.extractall(aphwpath)
                 self.create_tree(aphwpath, self.setting_data.file_names, self.cppfolder, self.pythonfolder)
-                # shutil.rmtree(aphwpath)
+                shutil.rmtree(aphwpath)
             return True
 
-    def pycomment(unittestpath):
+    def pycomment(self, unittestpath):
         os.chdir(unittestpath)                                             #path of grading folder
         s = open("aphw_unittest.py").read()
         test_class = s[s.find("class Test(unittest.TestCase):")+30:s.rfind("if __name__=='__main__':")]   #all test
@@ -178,7 +178,7 @@ class directory():
         #at last we have: testlist = [(test num n, n), (test num n-1, n-1),...(test num 1, 1), (full test, 0)]
         return test_list
 
-    def cppcomment(unittestpath):
+    def cppcomment(self, unittestpath):
         os.chdir(unittestpath)                                  #path of grading folder
         s = open("aphw_unittest.cpp").read()
         namespace = s[s.find("namespace\n{")+11:s.rfind("}")]   #all test
