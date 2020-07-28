@@ -155,4 +155,5 @@ class directory():
                 Path(aphwpath).mkdir(parents = True, exist_ok=True)
                 zip_ref.extractall(aphwpath)
                 create_tree(aphwpath, self.setting_data.file_names, cppfolder, pythonfolder)
+                # shutil.rmtree(aphwpath)
             return True
