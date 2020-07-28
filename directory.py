@@ -5,9 +5,11 @@ import zipfile
 import itertools
 from pathlib import Path
 
+# import setting.py
+
 class directory():       
-    def __init__(self, setting_Data, aphwfolderpath, cppfolder, pythonfolder):
-        self.setting_data = setting_Data
+    def __init__(self, setting_data, aphwfolderpath, cppfolder, pythonfolder):
+        self.setting_data = setting_data
         self.cppfolder = cppfolder
         self.pythonfolder = pythonfolder
         self.aphwfolderpath = aphwfolderpath
@@ -141,11 +143,16 @@ class directory():
         return output
 
     def start():
-        aphwpath = os.path.abspath(self.aphwfolderpath )
-        hwpath = Path(str(Path(os.path.abspath(aphwpath)).parent) + '\hw')
-        # print(hwpath)
+        aphwzippath = os.path.abspath(self.aphwfolderpath)
+        aphwpath = Path(str(Path(os.path.abspath(aphwzippath)).parent) + r'\aphw')
+        hwpath = Path(str(Path(os.path.abspath(aphwzippath)).parent) + r'\hw')
         if os.path.exists(hwpath):
             return 'pls remove or rename hw folder'
+        elif os.path.exists(aphwpath):
+            return 'pls remove or rename aphw folder'
         else:
-            create_tree(self.aphwfolderpath, self.setting_Data.file_names, self.cppfolder, self.pythonfolder)
+            with zipfile.ZipFile(self.aphwfolderpath, 'r') as zip_ref:
+                Path(aphwpath).mkdir(parents = True, exist_ok=True)
+                zip_ref.extractall(aphwpath)
+                create_tree(aphwpath, self.setting_data.file_names, cppfolder, pythonfolder)
             return True
