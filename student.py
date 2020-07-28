@@ -202,6 +202,7 @@ class student():
         self.final_grade()
 
 if __name__ == "__main__":
+    #create folder hw
     l = ['aphw1.cpp','aphw1.h']
     folder = r'C:\Users\edr\Desktop\ta'
     folder2 = r'C:\Users\edr\Desktop\ta1'
