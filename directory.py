@@ -157,3 +157,49 @@ class directory():
                 create_tree(aphwpath, self.setting_data.file_names, cppfolder, pythonfolder)
                 # shutil.rmtree(aphwpath)
             return True
+
+    def pycomment(unittestpath):
+        os.chdir(unittestpath)                                             #path of grading folder
+        s = open("aphw_unittest.py").read()
+        test_class = s[s.find("class Test(unittest.TestCase):")+30:s.rfind("if __name__=='__main__':")]   #all test
+        temp = test_class
+        test_list = []                                          #list of tuple(num of test, unittest)
+        while temp.find("def") != -1:
+            temp1 = temp[:temp.rfind("def")]
+            test = temp[temp1.rfind("\n"):]                     #find last test that start from last endline before it
+            temp = temp.replace(test,'')                        #clear last test
+            full_test = s.replace(test_class, test)             #create a code with only one test(there is a test in test class)
+            test_list.append(full_test)    
+        #there are some code in test_list without the num of test, now we determine num of them
+        for i in range(len(test_list)):
+            test_list[i] = (test_list[i], len(test_list)-i)
+
+        test_list.append((s,0))                                 #the orginal unittest
+        #at last we have: testlist = [(test num n, n), (test num n-1, n-1),...(test num 1, 1), (full test, 0)]
+        return test_list
+
+    def cppcomment(unittestpath):
+        os.chdir(unittestpath)                                  #path of grading folder
+        s = open("aphw_unittest.cpp").read()
+        namespace = s[s.find("namespace\n{")+11:s.rfind("}")]   #all test
+        temp = namespace
+        s_tests = s.replace(namespace, '')                      #clear all test
+        
+        test_list = []                                          #list of tuple(num of test, unittest)
+        while temp.find("TEST(") != -1:
+            test = temp[temp.rfind("TEST("):temp.rfind("}")+1]  #find last test
+            temp = temp.replace(test,'')                        #clear last test
+            full_test = s.replace(namespace, test)              #create a code with only one test(there is a test in namespace)
+            test_list.append(full_test)                         
+        #there are some code in test_list without the num of test, now we determine num of them
+        for i in range(len(test_list)):
+            test_list[i] = (test_list[i], len(test_list)-i)
+        
+        test_list.append((s_tests,0))
+        test_list.append((s,0))                                 #the orginal unittest
+        #at last we have: testlist = [(test num n, n), (test num n-1, n-1),...(test num 1, 1), (empty namespace, 0), (full test, 0)]
+        return test_list
+
+
+#hw,aphw vojoud ndashte bashe
+#age zaboun pathone adress paython bde age cpp hast adrees cpp bde. kerm narize kolan
