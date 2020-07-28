@@ -52,9 +52,9 @@ class directory():
         for student in os.listdir(os.path.abspath(os.getcwd())):            #name of students are same as the name of students in aphw_i folder
             for ans in os.listdir(os.path.abspath(student)):                #CPlusPlus or Python
                 if ans == 'CPlusPlus':
-                    create_floder(str(hwpath)+r'\hw'+f'\{student}'+f'\{ans}', 'cpp', cppfilelist, cppfolder)
+                    self.create_floder(str(hwpath)+r'\hw'+f'\{student}'+f'\{ans}', 'cpp', cppfilelist, cppfolder)
                 if ans == 'Python':
-                    create_floder(str(hwpath)+r'\hw'+f'\{student}'+f'\{ans}', 'python', pythonfilelist, pythonfolder)
+                    self.create_floder(str(hwpath)+r'\hw'+f'\{student}'+f'\{ans}', 'python', pythonfilelist, pythonfolder)
 
     def create_floder(s, lan, list_name, folder_path):
         current_dir = os.path.abspath(os.getcwd())                          #the path that we come from to this function
@@ -71,7 +71,7 @@ class directory():
                             path = os.path.join(root, file)
                             dict.setdefault(name, []).append(path)
             vals = list(dict.values())
-            vals = check(vals)
+            vals = self.check(vals)
             vals = sorted(vals, key = lambda x:len(x))[::-1]                #sort dict according to the paths list
             answer = []                                                     #answer is a list of jaygasht ha! :))
                                                                             #ex for final result: [[aphw1.cpp path1, aphw1.h path1]
@@ -154,7 +154,7 @@ class directory():
             with zipfile.ZipFile(self.aphwfolderpath, 'r') as zip_ref:
                 Path(aphwpath).mkdir(parents = True, exist_ok=True)
                 zip_ref.extractall(aphwpath)
-                create_tree(aphwpath, self.setting_data.file_names, cppfolder, pythonfolder)
+                self.create_tree(aphwpath, self.setting_data.file_names, cppfolder, pythonfolder)
                 # shutil.rmtree(aphwpath)
             return True
 
