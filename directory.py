@@ -154,7 +154,7 @@ class directory():
             with zipfile.ZipFile(self.aphwfolderpath, 'r') as zip_ref:
                 Path(aphwpath).mkdir(parents = True, exist_ok=True)
                 zip_ref.extractall(aphwpath)
-                self.create_tree(aphwpath, self.setting_data.file_names, cppfolder, pythonfolder)
+                self.create_tree(aphwpath, self.setting_data.file_names, self.cppfolder, self.pythonfolder)
                 # shutil.rmtree(aphwpath)
             return True
 
