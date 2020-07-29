@@ -1,7 +1,6 @@
-import os
 import re
+import os
 import numbers
-# import subprocess
 import numpy as np
 
 class student():
@@ -14,7 +13,7 @@ class student():
         self.python_each_test_grade = python_each_test_grade
         self.folder_name = os.path.basename(folder_Address)
         self.farsi_name = ''
-        self.eng_name = ''
+        self.eng_name = 'None'
         self.student_id = 0  
 
         self.grades = []                    #key: number of test, value: point loss of that test. (?!)
@@ -24,10 +23,10 @@ class student():
         self.warnings = []                  #key: number of test, value: warning (string)
         self.images = []                    #key: number of test, value: image (string)
         self.builds = []
-        self.python_beauty = 0
+        # self.python_beauty = 0
         #self.moss = None
-        self.final_grade = 0
-
+        self.final_grade = -5
+        self.best_path = folder_Address
 
     def check_format(self, name):                                      #the name must be in shape "MohammadMahdiShojaefar9623065"
         if len(name) < 7 :
@@ -162,23 +161,41 @@ class student():
                 final += cpp_each_test_grade[i][1]-folder_grades_list[i][1]
         return final
 
-    def grading(self):
-        self.build_okay = 0
-        self.grades = {}
-        self.warnings = {}
-        self.images = {}
+    def grading(self):                                          #only cpp grade
+        all_output = []
+        final_output = []
+        current_path = os.getcwd()
+        os.chdir(folder_address)
+        if not os.path.exists('CPlusPlus'):
+            os.chdir(current_path)
+            return False
+
+        os.chdir('CPlusPlus')
+        for subs in os.listdir(os.path.abspath(os.getcwd())):
+            if subs[:7] == 'Answer_':
+                for manner in subs:
+                    f_grade, w_list, i_list, b_list = grade_cppfolder(subs)
+                    all_output.append([f_grade, w_list, i_list, b_list, os.path.abspath(manner)])
+        for i in range(len(all_output)):
+            if self.final_cppfolder_grade(all_output[i][0]) > self.final_grade:
+                self.final_grade = self.final_cppfolder_grade(all_output[i][0])
+                final_output = all_output[i]
+        self.grades = final_output[0]
+        self.warnings = final_output[1]
+        self.images = final_output[2]
+        self.builds = final_output[3]
+        self.best_path = final_outputp[4]
+        if len(self.builds) > 1:
+            self.build_okay = 1
 
     def beauty_check(self):
         self.python_beauty = 0
 
-    def final_grade(self):
-        self.final_grade = 0
-
     def run_student(self):
         self.pre_process()
         self.grading()
-        self.beauty_check()
-        self.final_grade()
+        # self.beauty_check()
+        # self.final_grade()
 
 if __name__ == "__main__":
     print('ok')
