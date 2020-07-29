@@ -5,16 +5,17 @@ import zipfile
 import itertools
 from pathlib import Path
 
-# import setting.py
+#import setting.py
 
-class directory():       
+class directory():    
+
     def __init__(self, setting_data, aphwfolderpath, cppfolder, pythonfolder):
         self.setting_data = setting_data
         self.cppfolder = cppfolder
         self.pythonfolder = pythonfolder
         self.aphwfolderpath = aphwfolderpath
 
-    def create_tree(s, l, cppfolder, pythonfolder):                         #l is a list consist of name of files
+    def create_tree(self, s, l, cppfolder, pythonfolder):                         #l is a list consist of name of files
         ispython = False
         iscpp = False
         pythonfilelist = []
@@ -26,7 +27,6 @@ class directory():
             if filename[-2:]=='.h' or filename[-4:]=='.hpp' or filename[-4:]=='.cpp':
                 iscpp = True
                 cppfilelist.append(filename)
-
         aphwpath = os.path.abspath(s)                                       #apwh_i path
         hwpath = Path(os.path.abspath(aphwpath)).parent                     #our folder path(named hw)
         Path(str(hwpath) + r'\hw').mkdir(parents = True, exist_ok=True)     #create hw in parent of aphw1
@@ -52,9 +52,9 @@ class directory():
         for student in os.listdir(os.path.abspath(os.getcwd())):            #name of students are same as the name of students in aphw_i folder
             for ans in os.listdir(os.path.abspath(student)):                #CPlusPlus or Python
                 if ans == 'CPlusPlus':
-                    self.create_floder(str(hwpath)+r'\hw'+f'\{student}'+f'\{ans}', 'cpp', cppfilelist, cppfolder)
+                    self.create_floder(str(hwpath)+r'\hw'+f'\{student}'+f'\{ans}', 'cpp', cppfilelist, self.cppfolder)
                 if ans == 'Python':
-                    self.create_floder(str(hwpath)+r'\hw'+f'\{student}'+f'\{ans}', 'python', pythonfilelist, pythonfolder)
+                    self.create_floder(str(hwpath)+r'\hw'+f'\{student}'+f'\{ans}', 'python', pythonfilelist, self.pythonfolder)
 
     def create_floder(self, s, lan, list_name, folder_path):
         current_dir = os.path.abspath(os.getcwd())                          #the path that we come from to this function
@@ -147,9 +147,11 @@ class directory():
         aphwpath = Path(str(Path(os.path.abspath(aphwzippath)).parent) + r'\aphw')
         hwpath = Path(str(Path(os.path.abspath(aphwzippath)).parent) + r'\hw')
         if os.path.exists(hwpath):
-            return 'pls remove or rename hw folder'
+            print('pls remove or rename hw folder')
+            return False
         elif os.path.exists(aphwpath):
-            return 'pls remove or rename aphw folder'
+            print('pls remove or rename aphw folder')
+            return False
         else:
             with zipfile.ZipFile(self.aphwfolderpath, 'r') as zip_ref:
                 Path(aphwpath).mkdir(parents = True, exist_ok=True)
@@ -200,6 +202,3 @@ class directory():
         #at last we have: testlist = [(test num n, n), (test num n-1, n-1),...(test num 1, 1), (empty namespace, 0), (full test, 0)]
         return test_list
 
-
-#hw,aphw vojoud ndashte bashe
-#age zaboun pathone adress paython bde age cpp hast adrees cpp bde. kerm narize kolan
