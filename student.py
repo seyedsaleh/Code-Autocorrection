@@ -136,8 +136,8 @@ class cppgrade():
         if len(self.builds) > 1:
             self.build_okay = 1
 
-    def run_student(self):
-        self.grading()
+    # def run_student(self):
+        # self.grading()
 
 class pygrade():
 
@@ -160,8 +160,8 @@ class pygrade():
     # def run_student(self):
         # self.grading()
 
-
 class student():
+
     def __init__(self, setting_Data, folder_Address, cpp_testlist, python_testlist, cpp_each_test_grade, python_each_test_grade):
         self.setting_data = setting_Data
         self.folder_address = folder_Address
@@ -177,6 +177,7 @@ class student():
         self.report_name_format = 0                             #1 if the report name format is okay.
         self.folder_name_format = 0                             #1 if the folder name format is okay.
 
+        self.cpp_grade = cppgrade(setting_Data, folder_Address, cpp_testlist, cpp_each_test_grade)
         # self.grades = []                    #key: number of test, value: point loss of that test. (?!)
         # self.build_okay = 0                 # 1 if built successfully.
         # self.warnings = []                   #key: number of test, value: warning (string)
@@ -200,8 +201,8 @@ class student():
         pdfname = []
         subname = []
         temp = []
-        os.chdir(folder_Address)
-        s = os.path.basename(folder_Address)
+        os.chdir(self.folder_address)
+        s = os.path.basename(self.folder_address)
         for ch in s:
             if not(ch>='a' and ch<='z') and not(ch>='A' and ch<='Z') and not(ch>='0' and ch<='9') and ch != '_':
                 temp.append(ch)
@@ -233,23 +234,47 @@ class student():
                 self.folder_name_format = 1
                 self.eng_name, self.student_id = self.check_format(name)
 
-    # def run_student(self):
-    #     print('ok')
+    # def grade(self):
+        # self.cpp_grade.run_student()
+
+    def run_student(self):
+        self.pre_process()
+        self.cpp_grade.grading()
 
 if __name__ == "__main__":
-    print('ok')
+    print('main ok')
     cpp_testlist = [('#include <limits.h>\n#include "aphw1.h"\n#include <iostream>\n#include <iomanip>\n#include <vector>\n#include "gtest/gtest.h"\nnamespace\n{TEST(APHW1Test, dispFunctionTest)\n{\n  std::vector<std::vector<double>> data{getData("AP-Data.csv")};\n    displayDataset(data);\n}}\n', 6), ('#include <limits.h>\n#include "aphw1.h"\n#include <iostream>\n#include <iomanip>\n#include <vector>\n#include "gtest/gtest.h"\nnamespace\n{TEST(APHW1Test, saveLoadFunctionTest)\n{\n    std::vector<std::vector<double>> data{getData("AP-Data.csv")};\n    std::vector<double> w {1, 2, 3, 4, 5, 6, 7};\n    save(w, "wd.csv");\n    std::vector<double> w1;\n    w1 = load("wd.csv");\n    EXPECT_EQ(5, w1[4])<<std::setw(100)<<"***********minus 5***********";\n    EXPECT_EQ(7, w1[6])<<std::setw(100)<<"***********minus 5***********";\n}}\n', 5), ('#include <limits.h>\n#include "aphw1.h"\n#include <iostream>\n#include <iomanip>\n#include <vector>\n#include "gtest/gtest.h"\nnamespace\n{TEST(APHW1Test, trainFunctionTest)\n{\n    std::vector<std::vector<double>> data{getData("AP-Data.csv")};\n    std::vector<double> w (7, 0);\n    w = train(data, w, 0.01, 500, 0.01, false);\n    std::cout<<"Weights...\\n";\n    for(size_t i{}; i<w.size(); std::cout << w[i++] << " ,");\n    std::cout<<"\\n";\n    EXPECT_TRUE((w[0]>5) && (w[0]<6) && (w[6] > 2) && (w[6] < 3))<<std::setw(50)<<"***********minus 20***********";;\n}}\n', 4), ('#include <limits.h>\n#include "aphw1.h"\n#include <iostream>\n#include <iomanip>\n#include <vector>\n#include "gtest/gtest.h"\nnamespace\n{TEST(APHW1Test, costFunctionTest)\n{\n    std::vector<std::vector<double>> data{getData("AP-Data.csv")};\n    std::vector<double> w (7, 1);\n    std::cout << "CostFunction Test here!" << std::endl;\n    EXPECT_TRUE((45 < J(w, data)) && (52 > J(w, data)))<<std::setw(50)<<"***********minus 20***********";;\n}}\n', 3), ('#include <limits.h>\n#include "aphw1.h"\n#include <iostream>\n#include <iomanip>\n#include <vector>\n#include "gtest/gtest.h"\nnamespace\n{TEST(APHW1Test, gradeFunctionTest)\n{\n    std::vector<double> student{1, 2, 3, 4, 5, 6, 7};\n    std::vector<double> w (7, 1);\n    std::cout << "grade Test here!" << std::endl;\n    EXPECT_EQ(28, grade(w, student))<<std::setw(50)<<"***********minus 20***********";;\n}}\n', 2), ('#include <limits.h>\n#include "aphw1.h"\n#include <iostream>\n#include <iomanip>\n#include <vector>\n#include "gtest/gtest.h"\nnamespace\n{TEST(APHW1Test, getDataFunctionTest)\n{\n    std::vector<std::vector<double>> data{getData("AP-Data.csv")};\n    std::cout << "getData Test here!" << std::endl;\n    EXPECT_EQ(1, data[0][0])<<std::setw(50)<<"***********minus 10***********";;\n    EXPECT_EQ(14.23, data[0][7])<<std::setw(50)<<"***********minus 10***********";;\n}}\n', 1), ('#include <limits.h>\n#include "aphw1.h"\n#include <iostream>\n#include <iomanip>\n#include <vector>\n#include "gtest/gtest.h"\nnamespace\n{}\n', 0), ('#include <limits.h>\n#include "aphw1.h"\n#include <iostream>\n#include <iomanip>\n#include <vector>\n#include "gtest/gtest.h"\nnamespace\n{\nTEST(APHW1Test, getDataFunctionTest)\n{\n    std::vector<std::vector<double>> data{getData("AP-Data.csv")};\n    std::cout << "getData Test here!" << std::endl;\n    EXPECT_EQ(1, data[0][0])<<std::setw(50)<<"***********minus 10***********";;\n    EXPECT_EQ(14.23, data[0][7])<<std::setw(50)<<"***********minus 10***********";;\n}\nTEST(APHW1Test, gradeFunctionTest)\n{\n    std::vector<double> student{1, 2, 3, 4, 5, 6, 7};\n    std::vector<double> w (7, 1);\n    std::cout << "grade Test here!" << std::endl;\n    EXPECT_EQ(28, grade(w, student))<<std::setw(50)<<"***********minus 20***********";;\n}\nTEST(APHW1Test, costFunctionTest)\n{\n    std::vector<std::vector<double>> data{getData("AP-Data.csv")};\n    std::vector<double> w (7, 1);\n    std::cout <<"CostFunction Test here!" << std::endl;\n    EXPECT_TRUE((45 < J(w, data)) && (52 > J(w, data)))<<std::setw(50)<<"***********minus 20***********";;\n}\nTEST(APHW1Test, trainFunctionTest)\n{\n    std::vector<std::vector<double>> data{getData("AP-Data.csv")};\n    std::vector<double> w (7, 0);\n    w = train(data, w, 0.01, 500, 0.01, false);\n    std::cout<<"Weights...\\n";\n    for(size_t i{}; i<w.size(); std::cout << w[i++] << " ,");\n    std::cout<<"\\n";\n    EXPECT_TRUE((w[0]>5) && (w[0]<6) && (w[6] > 2) && (w[6] < 3))<<std::setw(50)<<"***********minus 20***********";;\n}\nTEST(APHW1Test, saveLoadFunctionTest)\n{\n    std::vector<std::vector<double>> data{getData("AP-Data.csv")};\n    std::vector<double> w {1, 2, 3, 4, 5, 6, 7};\n    save(w, "wd.csv");\n    std::vector<double> w1;\n    w1 = load("wd.csv");\n    EXPECT_EQ(5, w1[4])<<std::setw(100)<<"***********minus 5***********";\n    EXPECT_EQ(7, w1[6])<<std::setw(100)<<"***********minus 5***********";\n}\nTEST(APHW1Test, dispFunctionTest)\n{\n    std::vector<std::vector<double>> data{getData("AP-Data.csv")};\n    displayDataset(data);\n}\n}\n', 0)]
     cpp_each_test_grade = [[6, 0], [5, 10], [4, 20], [3, 20], [2, 20], [1, 20]]
-    x = cppgrade(1,r'C:\Users\edr\Desktop\grading\دل ارام غباری_5480_assignsubmission_file_',cpp_testlist,cpp_each_test_grade)
-    x.run_student()
-    print(x.final_grade)
+#test cppgrade
+    # x = cppgrade(1,r'C:\Users\edr\Desktop\grading\دل ارام غباری_5480_assignsubmission_file_',cpp_testlist,cpp_each_test_grade)
+    # x = cppgrade(1,r'C:\Users\edr\Desktop\grading\علی یعقوبیان_5482_assignsubmission_file_',cpp_testlist,cpp_each_test_grade)
+    # x.grading()
+    # print(x.final_grade)
+    # print('')
+    # print(x.grades)
+    # print('')
+    # print(x.warnings)
+    # print('')
+    # print(x.images[0][1])
+    # print('')
+    # print(f'build okay = {x.build_okay}')
+    # print('')
+    # print(x.best_path)
+#test student
+    s = student(1,r'C:\Users\edr\Desktop\grading\دل ارام غباری_5480_assignsubmission_file_', cpp_testlist, [], cpp_each_test_grade, [])
+    s.run_student()
+    print(s.report_name_format)
+    print(s.folder_name_format)
+    print(s.farsi_name)
+    print(s.eng_name)
+    print(s.student_id)
     print('')
-    print(x.grades)
+    print(s.cpp_grade.grades)
     print('')
-    print(x.warnings)
+    print(s.cpp_grade.warnings)
     print('')
-    print(x.images[0][1])
+    print(s.cpp_grade.images[0][1])
     print('')
-    print(f'build okay = {x.build_okay}')
+    print(f'build okay = {s.cpp_grade.build_okay}')
     print('')
-    print(x.best_path)
+    print(s.cpp_grade.best_path)
