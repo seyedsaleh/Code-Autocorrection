@@ -121,7 +121,7 @@ class cppgrade():
         for subs in os.listdir(os.path.abspath(os.getcwd())):
             if subs[:7] == 'Answer_':
                 for manner in os.listdir(os.path.abspath(subs)):
-                    print(os.getcwd()+fr'\{subs}\{manner}')
+                    # print(os.getcwd()+fr'\{subs}\{manner}')
                     f_grade, w_list, i_list, b_list = self.grade_folder(os.getcwd()+fr'\{subs}\{manner}')
                     all_output.append([f_grade, w_list, i_list, b_list, os.path.abspath(manner)])
         for i in range(len(all_output)):
@@ -139,6 +139,7 @@ class cppgrade():
     # def run_student(self):
         # self.grading()
 
+
 class pygrade():
 
     def __init__(self, setting_Data, folder_Address, python_testlist, python_each_test_grade):
@@ -153,12 +154,124 @@ class pygrade():
         self.best_path = folder_Address
         self.moss = None
         self.moss_id = 0
+        self.final_grade = -5
 
     def beauty_check(self):
         self.python_beauty = 0
     
-    # def run_student(self):
-        # self.grading()
+    def grade_folder(self, s, docker_on = True):
+        final_grade = []
+        img_list = []
+        current_path = os.path.abspath(os.getcwd())
+        os.chdir(s)                                             #first we create test list, then we grade the code
+        if docker_on == True:
+            for i in range(len(self.python_testlist)-1):
+                #change unittest to grade each test
+                with open(r'aphw_unittest.py', "r+") as f:
+                    data = f.read()
+                    f.seek(0)
+                    f.write(self.python_testlist[i][0])
+                    f.truncate()
+
+                # stop = os.popen('docker stop hw1').read()
+                xxx = np.random.randint(1000000)
+                ans = os.popen(f'docker build -t ap1398/hw{xxx} .').read()      #4/4 or 6/6 ...
+                # print(ans)
+                if( ans.find('Successfully built') != -1):      #it happens when the code can't compile correctly, so the grade of this test is zero
+                    # img = os.popen('docker run --rm ap1398/hw1').read() #when the code compile correctlr, we check the result
+                    main_img = subprocess.Popen(f'docker run --rm ap1398/hw{xxx}',shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                    out, err = main_img.communicate()
+                    # print(str(err))
+                    img = str(out.decode())         #-------------khoroji mide. ro in bayad donbal failure begardam--------------
+                    img_list.append([self.python_testlist[i][1], img])
+                    # print(img)
+                    if img.find('ERROR:') != -1:
+                        final_grade.append([self.python_testlist[i][1],'Error'])           #error
+                    elif img.find('FAIL:') == -1:                              #passed
+                        final_grade.append([self.python_testlist[i][1], 0])
+                    else:
+                        ansg = 0
+                        numinus = len(re.findall('minus', img)) #get num of failed test(EXPECT_EQ)
+                        while numinus > 0:
+                            minustr = img[img.rfind("minus"):]
+                            minus = re.findall(r'[-+]?\d*\.\d+|\d+', minustr)[0]    #find the grade of each test(EXPECT_EQ)
+                            ansg += float(minus)
+                            img = img.replace(minustr,'')
+                            numinus-=1
+                        final_grade.append([self.python_testlist[i][1], ansg/2])              #failed
+                else:
+                    final_grade.append([self.python_testlist[i][1], 'Error'])               #error
+        else:
+            for i in range(len(self.python_testlist)-1):
+                #change unittest to grade each test
+                with open(r'aphw_unittest.py', "r+") as f:
+                    data = f.read()
+                    f.seek(0)
+                    f.write(self.python_testlist[i][0])
+                    f.truncate()
+
+                main_img = subprocess.Popen(r'C:/Users/edr/anaconda3/python.exe aphw_unittest.py', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                out, err = main_img.communicate()
+                # print(str(err))
+                img = str(out.decode())            #khoroji mide. ro in bayad donbal failure begardam 
+                img_list.append([self.python_testlist[i][1], img])
+                # ans = os.popen('C:/Users/edr/anaconda3/python.exe test.py').read()    #12/12 ...------------------ham adress python ham name test.py bayad avaz shavad--------------------------
+                # print(img)
+                if( img.find('ERROR:') != -1):      #it happens when the code can't compile correctly, so the grade of this test is zero
+                    final_grade.append([self.python_testlist[i][1], 'Error'])               #error
+                elif img.find('FAIL:') == -1:                                  #passed
+                    final_grade.append([self.python_testlist[i][1], 0])
+                else:
+                    ansg = 0
+                    numinus = len(re.findall('minus', img))                     #get num of failed test(EXPECT_EQ)
+                    while numinus > 0:
+                        minustr = img[img.rfind("minus"):]
+                        minus = re.findall(r'[-+]?\d*\.\d+|\d+', minustr)[0]    #find the grade of each test(EXPECT_EQ)
+                        ansg += float(minus)
+                        img = img.replace(minustr,'')
+                        numinus-=1
+                    final_grade.append([self.python_testlist[i][1], ansg/2])           #failed
+
+        with open(r'aphw_unittest.py', "r+") as f:        #change unittest to first manner
+                    data = f.read()
+                    f.seek(0)
+                    f.write(self.python_testlist[-1][0])
+                    f.truncate()
+        os.chdir(current_path)
+        # print(final_grade)
+        return final_grade, img_list                            #ex for final grades: [[1,1],[2,0],[3,Compile Error],[4,1]]
+                                                                #means test 1 and 4 passed and test 2 failed. test 3 had compile error
+
+    def final_folder_grade(self, folder_grades_list):
+        final = 0
+        for i in range(len(self.python_each_test_grade)):
+            if isinstance(folder_grades_list[i][1], numbers.Number):
+                final += self.python_each_test_grade[i][1]-folder_grades_list[i][1]
+        return final
+
+    def grading(self):                                          #only python grade
+        all_output = []
+        final_output = []
+        current_path = os.getcwd()
+        os.chdir(self.folder_address)
+        if not os.path.exists('Python'):
+            os.chdir(current_path)
+            return False
+
+        os.chdir('Python')
+        for subs in os.listdir(os.path.abspath(os.getcwd())):
+            if subs[:7] == 'Answer_':
+                for manner in os.listdir(os.path.abspath(subs)):
+                    f_grade, i_list = self.grade_folder(os.getcwd()+fr'\{subs}\{manner}', False)
+                    all_output.append([f_grade, i_list, os.path.abspath(manner)])
+        for i in range(len(all_output)):
+            if self.final_folder_grade(all_output[i][0]) > self.final_grade:
+                self.final_grade = self.final_folder_grade(all_output[i][0])
+                final_output = all_output[i]
+        self.grades = final_output[0]
+        self.images = final_output[1]
+        self.best_path = final_output[2]
+
 
 class student():
 
@@ -237,7 +350,7 @@ class student():
     # def grade(self):
         # self.cpp_grade.run_student()
 
-    def run_student(self):
+    def run_student(self):          #zaboonesho check konam age cpp bud self.cpp_grade.grading() run konam age python bud self.py_grade.grading()
         self.pre_process()
         self.cpp_grade.grading()
 
@@ -245,6 +358,18 @@ if __name__ == "__main__":
     print('main ok')
     cpp_testlist = [('#include <limits.h>\n#include "aphw1.h"\n#include <iostream>\n#include <iomanip>\n#include <vector>\n#include "gtest/gtest.h"\nnamespace\n{TEST(APHW1Test, dispFunctionTest)\n{\n  std::vector<std::vector<double>> data{getData("AP-Data.csv")};\n    displayDataset(data);\n}}\n', 6), ('#include <limits.h>\n#include "aphw1.h"\n#include <iostream>\n#include <iomanip>\n#include <vector>\n#include "gtest/gtest.h"\nnamespace\n{TEST(APHW1Test, saveLoadFunctionTest)\n{\n    std::vector<std::vector<double>> data{getData("AP-Data.csv")};\n    std::vector<double> w {1, 2, 3, 4, 5, 6, 7};\n    save(w, "wd.csv");\n    std::vector<double> w1;\n    w1 = load("wd.csv");\n    EXPECT_EQ(5, w1[4])<<std::setw(100)<<"***********minus 5***********";\n    EXPECT_EQ(7, w1[6])<<std::setw(100)<<"***********minus 5***********";\n}}\n', 5), ('#include <limits.h>\n#include "aphw1.h"\n#include <iostream>\n#include <iomanip>\n#include <vector>\n#include "gtest/gtest.h"\nnamespace\n{TEST(APHW1Test, trainFunctionTest)\n{\n    std::vector<std::vector<double>> data{getData("AP-Data.csv")};\n    std::vector<double> w (7, 0);\n    w = train(data, w, 0.01, 500, 0.01, false);\n    std::cout<<"Weights...\\n";\n    for(size_t i{}; i<w.size(); std::cout << w[i++] << " ,");\n    std::cout<<"\\n";\n    EXPECT_TRUE((w[0]>5) && (w[0]<6) && (w[6] > 2) && (w[6] < 3))<<std::setw(50)<<"***********minus 20***********";;\n}}\n', 4), ('#include <limits.h>\n#include "aphw1.h"\n#include <iostream>\n#include <iomanip>\n#include <vector>\n#include "gtest/gtest.h"\nnamespace\n{TEST(APHW1Test, costFunctionTest)\n{\n    std::vector<std::vector<double>> data{getData("AP-Data.csv")};\n    std::vector<double> w (7, 1);\n    std::cout << "CostFunction Test here!" << std::endl;\n    EXPECT_TRUE((45 < J(w, data)) && (52 > J(w, data)))<<std::setw(50)<<"***********minus 20***********";;\n}}\n', 3), ('#include <limits.h>\n#include "aphw1.h"\n#include <iostream>\n#include <iomanip>\n#include <vector>\n#include "gtest/gtest.h"\nnamespace\n{TEST(APHW1Test, gradeFunctionTest)\n{\n    std::vector<double> student{1, 2, 3, 4, 5, 6, 7};\n    std::vector<double> w (7, 1);\n    std::cout << "grade Test here!" << std::endl;\n    EXPECT_EQ(28, grade(w, student))<<std::setw(50)<<"***********minus 20***********";;\n}}\n', 2), ('#include <limits.h>\n#include "aphw1.h"\n#include <iostream>\n#include <iomanip>\n#include <vector>\n#include "gtest/gtest.h"\nnamespace\n{TEST(APHW1Test, getDataFunctionTest)\n{\n    std::vector<std::vector<double>> data{getData("AP-Data.csv")};\n    std::cout << "getData Test here!" << std::endl;\n    EXPECT_EQ(1, data[0][0])<<std::setw(50)<<"***********minus 10***********";;\n    EXPECT_EQ(14.23, data[0][7])<<std::setw(50)<<"***********minus 10***********";;\n}}\n', 1), ('#include <limits.h>\n#include "aphw1.h"\n#include <iostream>\n#include <iomanip>\n#include <vector>\n#include "gtest/gtest.h"\nnamespace\n{}\n', 0), ('#include <limits.h>\n#include "aphw1.h"\n#include <iostream>\n#include <iomanip>\n#include <vector>\n#include "gtest/gtest.h"\nnamespace\n{\nTEST(APHW1Test, getDataFunctionTest)\n{\n    std::vector<std::vector<double>> data{getData("AP-Data.csv")};\n    std::cout << "getData Test here!" << std::endl;\n    EXPECT_EQ(1, data[0][0])<<std::setw(50)<<"***********minus 10***********";;\n    EXPECT_EQ(14.23, data[0][7])<<std::setw(50)<<"***********minus 10***********";;\n}\nTEST(APHW1Test, gradeFunctionTest)\n{\n    std::vector<double> student{1, 2, 3, 4, 5, 6, 7};\n    std::vector<double> w (7, 1);\n    std::cout << "grade Test here!" << std::endl;\n    EXPECT_EQ(28, grade(w, student))<<std::setw(50)<<"***********minus 20***********";;\n}\nTEST(APHW1Test, costFunctionTest)\n{\n    std::vector<std::vector<double>> data{getData("AP-Data.csv")};\n    std::vector<double> w (7, 1);\n    std::cout <<"CostFunction Test here!" << std::endl;\n    EXPECT_TRUE((45 < J(w, data)) && (52 > J(w, data)))<<std::setw(50)<<"***********minus 20***********";;\n}\nTEST(APHW1Test, trainFunctionTest)\n{\n    std::vector<std::vector<double>> data{getData("AP-Data.csv")};\n    std::vector<double> w (7, 0);\n    w = train(data, w, 0.01, 500, 0.01, false);\n    std::cout<<"Weights...\\n";\n    for(size_t i{}; i<w.size(); std::cout << w[i++] << " ,");\n    std::cout<<"\\n";\n    EXPECT_TRUE((w[0]>5) && (w[0]<6) && (w[6] > 2) && (w[6] < 3))<<std::setw(50)<<"***********minus 20***********";;\n}\nTEST(APHW1Test, saveLoadFunctionTest)\n{\n    std::vector<std::vector<double>> data{getData("AP-Data.csv")};\n    std::vector<double> w {1, 2, 3, 4, 5, 6, 7};\n    save(w, "wd.csv");\n    std::vector<double> w1;\n    w1 = load("wd.csv");\n    EXPECT_EQ(5, w1[4])<<std::setw(100)<<"***********minus 5***********";\n    EXPECT_EQ(7, w1[6])<<std::setw(100)<<"***********minus 5***********";\n}\nTEST(APHW1Test, dispFunctionTest)\n{\n    std::vector<std::vector<double>> data{getData("AP-Data.csv")};\n    displayDataset(data);\n}\n}\n', 0)]
     cpp_each_test_grade = [[6, 0], [5, 10], [4, 20], [3, 20], [2, 20], [1, 20]]
+    python_testlist = [('import unittest\nimport aphw6\n\nclass Test(unittest.TestCase):\n    def test2(self):\n        fact = aphw6.Factorial()\n        x = fact(5)\n        self.assertEqual(x, 120, "***********minus 25***********")\n        self.assertEqual(fact.dict[3], 6, "***********minus 20***********")\n\nif __name__==\'__main__\':\n    unittest.main()', 2), ('import unittest\nimport aphw6\n\nclass Test(unittest.TestCase):\n    def test1(self):\n        with open(\'a.jpg\', \'rb\') as file:\n            b1 = file.read()\n        aphw6.code(\'a.jpg\', lambda x: 255 - x)\n        with open(\'a.jpg\', \'rb\') as file:\n            b2 = file.read()\n        self.assertEqual(b1[5], 255-b2[5], "***********minus 55***********")\nif __name__==\'__main__\':\n    unittest.main()', 1), ('import unittest\nimport aphw6\n\nclass Test(unittest.TestCase):\n    def test1(self):\n        with open(\'a.jpg\', \'rb\') as file:\n          b1 = file.read()\n        aphw6.code(\'a.jpg\', lambda x: 255 - x)\n        with open(\'a.jpg\', \'rb\') as file:\n            b2 = file.read()\n        self.assertEqual(b1[5], 255-b2[5], "***********minus 50***********")\n\n    def test2(self):\n        fact = aphw6.Factorial()\n        x = fact(5)\n        self.assertEqual(x, 1210, "***********minus30***********")\n        self.assertEqual(fact.dict[3], 6, "***********minus 20***********")\n\nif __name__==\'__main__\':\n    unittest.main()', 0)]
+    python_each_test_grade = [[2,45],[1,55]]
+#test pythongrade    
+    # x = pygrade(1,r'C:\Users\edr\Desktop\grading\علی یعقوبیان_5482_assignsubmission_file_', python_testlist, python_each_test_grade)
+    # x.grading()
+    # print('*********************************')
+    # print(x.images[0][1])
+    # print('*********************************')
+    # print(x.images[1][1])
+    # print(x.best_path)
+    # print(x.final_grade)
+    # print(x.grades)
 #test cppgrade
     # x = cppgrade(1,r'C:\Users\edr\Desktop\grading\دل ارام غباری_5480_assignsubmission_file_',cpp_testlist,cpp_each_test_grade)
     # x = cppgrade(1,r'C:\Users\edr\Desktop\grading\علی یعقوبیان_5482_assignsubmission_file_',cpp_testlist,cpp_each_test_grade)
@@ -261,20 +386,20 @@ if __name__ == "__main__":
     # print('')
     # print(x.best_path)
 #test student
-    s = student(1,r'C:\Users\edr\Desktop\grading\دل ارام غباری_5480_assignsubmission_file_', cpp_testlist, [], cpp_each_test_grade, [])
-    s.run_student()
-    print(s.report_name_format)
-    print(s.folder_name_format)
-    print(s.farsi_name)
-    print(s.eng_name)
-    print(s.student_id)
-    print('')
-    print(s.cpp_grade.grades)
-    print('')
-    print(s.cpp_grade.warnings)
-    print('')
-    print(s.cpp_grade.images[0][1])
-    print('')
-    print(f'build okay = {s.cpp_grade.build_okay}')
-    print('')
-    print(s.cpp_grade.best_path)
+    # s = student(1,r'C:\Users\edr\Desktop\grading\دل ارام غباری_5480_assignsubmission_file_', cpp_testlist, [], cpp_each_test_grade, [])
+    # s.run_student()
+    # print(s.report_name_format)
+    # print(s.folder_name_format)
+    # print(s.farsi_name)
+    # print(s.eng_name)
+    # print(s.student_id)
+    # print('')
+    # print(s.cpp_grade.grades)
+    # print('')
+    # print(s.cpp_grade.warnings)
+    # print('')
+    # print(s.cpp_grade.images[0][1])
+    # print('')
+    # print(f'build okay = {s.cpp_grade.build_okay}')
+    # print('')
+    # print(s.cpp_grade.best_path)
