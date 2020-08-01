@@ -4,6 +4,8 @@ import numbers
 import subprocess
 import numpy as np
 
+from setting import *
+
 class cppgrade():
 
     def __init__(self, setting_Data, folder_Address, cpp_testlist, cpp_each_test_grade):
@@ -47,13 +49,13 @@ class cppgrade():
             f.write(self.cpp_testlist[-2][0])
             f.truncate()
         xxx = np.random.randint(1000000)
-        stop = os.popen('docker stop hw1').read()
+        # stop = os.popen('docker stop hw1').read()
         # os.system('docker build --no-cache -t ap1398/hw1 .')
         ans = os.popen(f'docker build -t ap1398/hw{xxx} --build-arg CACHEBUST=1 .').read()   #12/12 ...check the code is ok or not
         # print(ans)
         build_list.append([-1, ans])
         warning_list = self.findwarning(ans)                    #create warning list
-        if( ans.find('Successfully built') == -1):              #it happens when the code cant compile correctly, so the final grade is zero
+        if( ans.find(self.setting_data.build_keyWord) == -1):              #it happens when the code cant compile correctly, so the final grade is zero
             final_grade = [[i+1,'Compile Error All'] for i in range(len(self.cpp_testlist)-2)]
         else:                                                   #now we grade each test
             for i in range(len(self.cpp_testlist)-2):
@@ -64,23 +66,23 @@ class cppgrade():
                     f.write(self.cpp_testlist[i][0])
                     f.truncate()
 
-                stop = os.popen('docker stop hw1').read()
+                # stop = os.popen('docker stop hw1').read()
                 # os.system('docker build -t ap1398/hw1 .')
                 ans = os.popen(f'docker build -t ap1398/hw{xxx} .').read()    #12/12 ...
                 build_list.append([self.cpp_testlist[i][1], ans])
-                if( ans.find('Successfully built') != -1):      #it happens when the code can't compile correctly, so the grade of this test is zero
+                if( ans.find(self.setting_data.build_keyWord) != -1):      #it happens when the code can't compile correctly, so the grade of this test is zero
                     # warning_list.append([test_list[i][1], findwarning(ans)])
                     img = os.popen(f'docker run --rm ap1398/hw{xxx}').read() #when the code compile correctlr, we check the result
                     img_list.append([self.cpp_testlist[i][1], img])
                     # print(ans)#show warning
                     # print(img)
-                    if img.find('<<<SUCCESS>>>') != -1:         #passed
+                    if img.find(self.setting_data.cppTest_keyWord) != -1:         #passed
                         final_grade.append([self.cpp_testlist[i][1],0])
                     else:
                         ansg = 0
-                        numinus = len(re.findall('minus', img)) #get num of failed test(EXPECT_EQ)
+                        numinus = len(re.findall(self.setting_data.minus_keyWord, img)) #get num of failed test(EXPECT_EQ)
                         while numinus > 0:
-                            minustr = img[img.rfind("minus"):]
+                            minustr = img[img.rfind(self.setting_data.minus_keyWord):]
                             minus = re.findall(r'[-+]?\d*\.\d+|\d+', minustr)[0]    #find the grade of each test(EXPECT_EQ)
                             ansg += float(minus)
                             img = img.replace(minustr, '')
@@ -114,15 +116,20 @@ class cppgrade():
         os.chdir(self.folder_address)
         if not os.path.exists('CPlusPlus'):
             os.chdir(current_path)
+            self.display_signal.emit(f"This student doesn't have any cpp code to grade...", False)
             return False
 
         os.chdir('CPlusPlus')
         print(os.getcwd())
         for subs in os.listdir(os.path.abspath(os.getcwd())):
             if subs[:7] == 'Answer_':
+                count = 1
                 for manner in os.listdir(os.path.abspath(subs)):
                     # print(os.getcwd()+fr'\{subs}\{manner}')
+                    self.display_signal.emit(f"Trying to grade manner {count}...", True)
                     f_grade, w_list, i_list, b_list = self.grade_folder(os.getcwd()+fr'\{subs}\{manner}')
+                    self.display_signal.emit(f"Grading manner {count} finished...", True)
+                    count += 1
                     all_output.append([f_grade, w_list, i_list, b_list, os.path.abspath(manner)])
         for i in range(len(all_output)):
             if self.final_folder_grade(all_output[i][0]) > self.final_grade:
@@ -135,9 +142,6 @@ class cppgrade():
         self.best_path = final_output[4]
         if len(self.builds) > 1:
             self.build_okay = 1
-
-    # def run_student(self):
-        # self.grading()
 
 
 class pygrade():
@@ -154,7 +158,7 @@ class pygrade():
         self.best_path = folder_Address
         self.moss = None
         self.moss_id = 0
-        self.final_grade = -5
+        self.final_grade = 0
 
     def beauty_check(self):
         self.python_beauty = 0
@@ -177,7 +181,7 @@ class pygrade():
                 xxx = np.random.randint(1000000)
                 ans = os.popen(f'docker build -t ap1398/hw{xxx} .').read()      #4/4 or 6/6 ...
                 # print(ans)
-                if( ans.find('Successfully built') != -1):      #it happens when the code can't compile correctly, so the grade of this test is zero
+                if( ans.find(self.setting_data.build_keyWord) != -1):      #it happens when the code can't compile correctly, so the grade of this test is zero
                     # img = os.popen('docker run --rm ap1398/hw1').read() #when the code compile correctlr, we check the result
                     main_img = subprocess.Popen(f'docker run --rm ap1398/hw{xxx}',shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                     out, err = main_img.communicate()
@@ -187,13 +191,13 @@ class pygrade():
                     # print(img)
                     if img.find('ERROR:') != -1:
                         final_grade.append([self.python_testlist[i][1],'Error'])           #error
-                    elif img.find('FAIL:') == -1:                              #passed
+                    elif img.find(self.setting_data.pyTest_keyWord) == -1:                              #passed
                         final_grade.append([self.python_testlist[i][1], 0])
                     else:
                         ansg = 0
-                        numinus = len(re.findall('minus', img)) #get num of failed test(EXPECT_EQ)
+                        numinus = len(re.findall(self.setting_data.minus_keyWord, img)) #get num of failed test(EXPECT_EQ)
                         while numinus > 0:
-                            minustr = img[img.rfind("minus"):]
+                            minustr = img[img.rfind(self.setting_data.minus_keyWord):]
                             minus = re.findall(r'[-+]?\d*\.\d+|\d+', minustr)[0]    #find the grade of each test(EXPECT_EQ)
                             ansg += float(minus)
                             img = img.replace(minustr,'')
@@ -219,13 +223,13 @@ class pygrade():
                 # print(img)
                 if( img.find('ERROR:') != -1):      #it happens when the code can't compile correctly, so the grade of this test is zero
                     final_grade.append([self.python_testlist[i][1], 'Error'])               #error
-                elif img.find('FAIL:') == -1:                                  #passed
+                elif img.find(self.setting_data.pyTest_keyWord) == -1:                                  #passed
                     final_grade.append([self.python_testlist[i][1], 0])
                 else:
                     ansg = 0
-                    numinus = len(re.findall('minus', img))                     #get num of failed test(EXPECT_EQ)
+                    numinus = len(re.findall(self.setting_data.minus_keyWord, img))                     #get num of failed test(EXPECT_EQ)
                     while numinus > 0:
-                        minustr = img[img.rfind("minus"):]
+                        minustr = img[img.rfind(self.setting_data.minus_keyWord):]
                         minus = re.findall(r'[-+]?\d*\.\d+|\d+', minustr)[0]    #find the grade of each test(EXPECT_EQ)
                         ansg += float(minus)
                         img = img.replace(minustr,'')
@@ -256,13 +260,17 @@ class pygrade():
         os.chdir(self.folder_address)
         if not os.path.exists('Python'):
             os.chdir(current_path)
+            self.display_signal.emit(f"This student doesn't have any python code to grade...", False)
             return False
 
         os.chdir('Python')
         for subs in os.listdir(os.path.abspath(os.getcwd())):
             if subs[:7] == 'Answer_':
+                count = 1
                 for manner in os.listdir(os.path.abspath(subs)):
-                    f_grade, i_list = self.grade_folder(os.getcwd()+fr'\{subs}\{manner}', False)
+                    self.display_signal.emit(f"Trying to grade manner {count}...", True)
+                    f_grade, i_list = self.grade_folder(os.getcwd()+fr'\{subs}\{manner}', self.setting_data.python_python)
+                    self.display_signal.emit(f"Grading manner {count} finished...", True)
                     all_output.append([f_grade, i_list, os.path.abspath(manner)])
         for i in range(len(all_output)):
             if self.final_folder_grade(all_output[i][0]) > self.final_grade:
@@ -291,14 +299,7 @@ class student():
         self.folder_name_format = 0                             #1 if the folder name format is okay.
 
         self.cpp_grade = cppgrade(setting_Data, folder_Address, cpp_testlist, cpp_each_test_grade)
-        # self.grades = []                    #key: number of test, value: point loss of that test. (?!)
-        # self.build_okay = 0                 # 1 if built successfully.
-        # self.warnings = []                   #key: number of test, value: warning (string)
-        # self.images = []                     #key: number of test, value: image (string)
-        # self.builds = []
-        # self.moss = None
-        # self.final_grade = -5
-        # self.best_path = folder_Address
+        self.python_grade = cppgrade(setting_Data, folder_Address, python_testlist, python_each_test_grade)
 
     def check_format(self, name):                               #the name must be in shape "MohammadMahdiShojaefar9623065"
         if len(name) < 7 :
@@ -347,12 +348,16 @@ class student():
                 self.folder_name_format = 1
                 self.eng_name, self.student_id = self.check_format(name)
 
-    # def grade(self):
-        # self.cpp_grade.run_student()
-
     def run_student(self):          #zaboonesho check konam age cpp bud self.cpp_grade.grading() run konam age python bud self.py_grade.grading()
+                                    #zaboonesho check nmiknm vli to func grading aval check miknm python ya cpp hast ya na
         self.pre_process()
+        self.display_signal.emit(f"Start grading {self.eng_name}'s cpp code...", True)
         self.cpp_grade.grading()
+        self.display_signal.emit(f"Grading {self.eng_name}'s cpp code finished...", True)
+        self.display_signal.emit(f"Start grading {self.eng_name}'s python code...", True)
+        self.python_grade.grading()
+        self.display_signal.emit(f"Grading {self.eng_name}'s python code finished...", True)
+
 
 if __name__ == "__main__":
     print('main ok')
