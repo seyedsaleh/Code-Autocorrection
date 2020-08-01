@@ -220,7 +220,7 @@ class Directory(QtCore.QThread):
         os.chdir(unittestpath)  # path of grading folder
         s = open("aphw_unittest.py").read()
         if s.find("class Test(unittest.TestCase):") == -1:
-            self.display_signal.emit("Please rewrite aphw_unittest.cpp and run the program again...", False)
+            self.display_signal.emit("Please rewrite aphw_unittest.py and run the program again...", False)
 
         test_class = s[s.find("class Test(unittest.TestCase):") + 30:s.rfind("if __name__=='__main__':")]  # all test
         temp = test_class
