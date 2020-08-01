@@ -219,6 +219,9 @@ class Directory(QtCore.QThread):
     def pycomment(self, unittestpath):
         os.chdir(unittestpath)  # path of grading folder
         s = open("aphw_unittest.py").read()
+        if s.find("class Test(unittest.TestCase):") == -1:
+            self.display_signal.emit("Please rewrite aphw_unittest.cpp and run the program again...", False)
+
         test_class = s[s.find("class Test(unittest.TestCase):") + 30:s.rfind("if __name__=='__main__':")]  # all test
         temp = test_class
         test_list = []  # list of tuple(num of test, unittest)
@@ -239,6 +242,9 @@ class Directory(QtCore.QThread):
     def cppcomment(self, unittestpath):
         os.chdir(unittestpath)  # path of grading folder
         s = open("aphw_unittest.cpp").read()
+        if s.find("namespace\n{") == -1:
+            self.display_signal.emit("Please rewrite aphw_unittest.cpp and run the program again...", False)
+        
         namespace = s[s.find("namespace\n{") + 11:s.rfind("}")]  # all test
         temp = namespace
         s_tests = s.replace(namespace, '')  # clear all test
