@@ -29,65 +29,74 @@ class Directory(QtCore.QThread):
             if filename[-2:] == '.h' or filename[-4:] == '.hpp' or filename[-4:] == '.cpp':
                 iscpp = True
                 cppfilelist.append(filename)
-
+        self.display_signal.emit("Trying to unzip all zipped files...", True)
         aphwpath = os.path.abspath(s)  # apwh_i path
         hwpath = Path(os.path.abspath(aphwpath)).parent  # our folder path(named hw)
-        Path(str(hwpath) + r'\hw').mkdir(parents=True, exist_ok=True)  # create hw in parent of aphw1
+        Path(str(hwpath) + r'\hw').mkdir(parents=True, exist_ok=True)  # create hw in parent of aphw_i
         os.chdir(aphwpath)
         for student in os.listdir(aphwpath):
-            Path(str(hwpath) + f'\hw\{student}').mkdir(parents=True, exist_ok=True)
-        aphw_pathlist = os.listdir(aphwpath)  # list of files in aphw1 folder ()
+            Path(str(hwpath) + fr'\hw\{student}').mkdir(parents=True, exist_ok=True)
+        aphw_pathlist = os.listdir(aphwpath)  # list of files in aphw_i folder ()
         for student in aphw_pathlist:
             for ans in os.listdir(student):
-                path = os.path.abspath(student) + f'\{ans}'
+                path = os.path.abspath(student) + fr'\{ans}'
                 if (zipfile.is_zipfile(path)):  # check the file is zip or not(rar or anything else)
-                    # if there isn't any zip file, the grade will be zero
+                                                # if there isn't any zip file, the grade will be zero
                     with zipfile.ZipFile(path, 'r') as zip_ref:
-                        Path(str(hwpath) + f'\hw\{student}').mkdir(parents=True, exist_ok=True)
+                        Path(str(hwpath) + fr'\hw\{student}').mkdir(parents=True, exist_ok=True)
                         if iscpp:
-                            zip_ref.extractall(
-                                str(hwpath) + f'\hw\{student}\CPlusPlus\{ans[:-4]}')  # unzip file in CPlusPlus folder
-                            # ans[:-4] show the name of sub without the '.zip'
+                            try:
+                                zip_ref.extractall(
+                                    str(hwpath) + fr'\hw\{student}\CPlusPlus\{ans[:-4]}')  # unzip file in CPlusPlus folder
+                                #                                                            ans[:-4] show the name of sub without the '.zip'
+                            except:
+                                self.display_signal.emit(f"Unable to unzip {path}...", False)
+                            
                         if ispython:
-                            zip_ref.extractall(
-                                str(hwpath) + f'\hw\{student}\Python\{ans[:-4]}')  # unzip file in Python folder
-                            # ans[:-4] show the name of sub without the '.zip'
+                            try:
+                                zip_ref.extractall(
+                                    str(hwpath) + fr'\hw\{student}\Python\{ans[:-4]}')  # unzip file in Python folder
+                                #                                                         ans[:-4] show the name of sub without the '.zip'
+                            except:
+                                self.display_signal.emit(f"Unable to unzip {path}...", False)
         # now we change dir to 'hw' to create folders to grade easier
+        self.display_signal.emit("All submissions unzipped...", True)
+        self.display_signal.emit("Trying to compute all manners of each submission...", True)
         os.chdir(str(hwpath) + r'\hw')
         for student in os.listdir(
                 os.path.abspath(os.getcwd())):  # name of students are same as the name of students in aphw_i folder
             for ans in os.listdir(os.path.abspath(student)):  # CPlusPlus or Python
                 if ans == 'CPlusPlus':
-                    self.create_floder(str(hwpath) + r'\hw' + f'\{student}' + f'\{ans}', 'cpp', cppfilelist, cppfolder)
+                    self.create_floder(str(hwpath) + r'\hw' + fr'\{student}' + fr'\{ans}', 'cpp', cppfilelist, cppfolder)
                 if ans == 'Python':
-                    self.create_floder(str(hwpath) + r'\hw' + f'\{student}' + f'\{ans}', 'python', pythonfilelist,
+                    self.create_floder(str(hwpath) + r'\hw' + fr'\{student}' + fr'\{ans}', 'python', pythonfilelist,
                                        pythonfolder)
 
     def create_floder(self, s, lan, list_name, folder_path):
         current_dir = os.path.abspath(os.getcwd())  # the path that we come from to this function
         os.chdir(s)  # hw\sub\CPlsPlus or Python
-        first_folder = os.listdir(os.getcwd())  # list of folder in CPlusPlus, actually the subs are in this folder
+        # first_folder = os.listdir(os.getcwd())  # list of folder in CPlusPlus, actually the subs are in this folder
         first_dir = os.getcwd()
         for sub in os.listdir(s):  # sub is submission
-            dict = {}  # for ex: dict = {'aphw1.cpp' : [path1, path2, path3]}
-            sub_dir = str(s) + f'\{sub}'
+            dic = {}  # for ex: dic = {'aphw1.cpp' : [path1, path2, path3]}
+            sub_dir = str(s) + fr'\{sub}'
             for name in list_name:  # now search each file(for ex: aphw1.cpp) in sub folder
                 for root, dirs, files in os.walk(sub_dir):
                     for file in files:
                         if file == name:
                             path = os.path.join(root, file)
-                            dict.setdefault(name, []).append(path)
-            vals = list(dict.values())
+                            dic.setdefault(name, []).append(path)
+            vals = list(dic.values())
             vals = self.check(vals)
-            vals = sorted(vals, key=lambda x: len(x))[::-1]  # sort dict according to the paths list
+            vals = sorted(vals, key = lambda x: len(x))[::-1]  # sort dictionary according to the paths list
             answer = []  # answer is a list of jaygasht ha! :))
             # ex for final result: [[aphw1.cpp path1, aphw1.h path1]
             #                      [aphw1.cpp path1, aphw1.h path2]]
-            if len(list(dict.keys())) == 1:
-                answer = list(map(lambda el: [el], list(dict.values())[0]))
+            if len(list(dic.keys())) == 1:
+                answer = list(map(lambda el: [el], list(dic.values())[0]))
 
             # calculate all state
-            if len(list(dict.keys())) > 1:
+            if len(list(dic.keys())) > 1:
                 for p1, p2 in itertools.product(vals[0], vals[1]):
                     answer.append((p1, p2))
             temp = answer.copy()
@@ -100,13 +109,13 @@ class Directory(QtCore.QThread):
             # create some folders for grading easier
             if lan == 'cpp':
                 for i in range(len(answer)):
-                    path_folder = first_dir + f'\Answer_{sub}' + f'\{sub}_{i + 1}'  # folder
+                    path_folder = first_dir + fr'\Answer_{sub}' + fr'\{sub}_{i + 1}'  # folder
                     Path(path_folder).mkdir(parents=True, exist_ok=True)
                     Path(path_folder + r'\cpp').mkdir(parents=True, exist_ok=True)
                     Path(path_folder + r'\h').mkdir(parents=True, exist_ok=True)
                     for file in answer[i]:
-                        for dataset in os.listdir(folder_path + '\dataset'):
-                            shutil.copy(folder_path + '\dataset' + f'\{dataset}', path_folder)
+                        for dataset in os.listdir(folder_path + r'\dataset'):
+                            shutil.copy(folder_path + r'\dataset' + fr'\{dataset}', path_folder)
                         shutil.copy(folder_path + r'\Makefile', path_folder)  # find and copy other files
                         shutil.copy(folder_path + r'\Dockerfile', path_folder)
                         shutil.copy(folder_path + r'\aphw_unittest.cpp', path_folder + r'\cpp')
@@ -117,11 +126,11 @@ class Directory(QtCore.QThread):
                             shutil.copy(file, path_folder + r'\h')
             if lan == 'python':
                 for i in range(len(answer)):
-                    path_folder = first_dir + f'\Answer_{sub}' + f'\{sub}_{i + 1}'  # folder
+                    path_folder = first_dir + fr'\Answer_{sub}' + fr'\{sub}_{i + 1}'  # folder
                     Path(path_folder).mkdir(parents=True, exist_ok=True)
                     for file in answer[i]:
-                        for dataset in os.listdir(folder_path + '\dataset'):
-                            shutil.copy(folder_path + '\dataset' + f'\{dataset}', path_folder)
+                        for dataset in os.listdir(folder_path + r'\dataset'):
+                            shutil.copy(folder_path + r'\dataset' + fr'\{dataset}', path_folder)
                         shutil.copy(folder_path + r'\Makefile', path_folder)  # find and copy other files
                         shutil.copy(folder_path + r'\Dockerfile', path_folder)
                         shutil.copy(folder_path + r'\aphw_unittest.py', path_folder)
@@ -153,6 +162,44 @@ class Directory(QtCore.QThread):
         aphwzippath = os.path.abspath(self.aphwfolderpath)
         aphwpath = Path(str(Path(os.path.abspath(aphwzippath)).parent) + r'\aphw')
         hwpath = Path(str(Path(os.path.abspath(aphwzippath)).parent) + r'\hw')
+        if aphwzippath == '':
+            self.display_signal.emit("Enter folder of student's files...", False)                    
+        
+        if not zipfile.is_zipfile(aphwzippath):
+            self.display_signal.emit("Studens'file must be zipped...", False)
+
+        if self.setting_data.file_names == []:
+            self.display_signal.emit("Enter name of files in this homework...", False)  
+
+        for files in self.setting_data.file_names:
+            if files[-3:] == '.py':
+                if self.pythonfolder == '':
+                    self.display_signal.emit("Enter python folder path...", False)
+                if not os.path.isfile(str(self.pythonfolder) + r'\Makefile'):
+                    self.display_signal.emit("Makefile must be in python folder...", False)
+                if not os.path.isfile(str(self.pythonfolder) + r'\requirements.txt'):
+                    self.display_signal.emit("requirements.txt folder must be in python folder...", False)
+                if not os.path.isfile(str(self.pythonfolder) + r'\Dockerfile'):
+                    self.display_signal.emit("Dockerfile must be in python folder...", False)
+                if not os.path.isfile(str(self.pythonfolder) + r'\aphw_unittest.py'):
+                    self.display_signal.emit("aphw_unittest.py must be in python folder...", False)
+                if not os.path.isdir(str(self.pythonfolder) + r'\dataset'):
+                    self.display_signal.emit("dataset folder must be in python folder...", False)
+
+            if files[-4:] == '.cpp' or files[-4:] == '.hpp' and files[-2:] == '.h':
+                if self.cppfolder == '':
+                    self.display_signal.emit("Enter cpp folder path...", False)   
+                if not os.path.isfile(str(self.cppfolder) + r'\Makefile'):
+                    self.display_signal.emit("Makefile must be in cpp folder...", False)
+                if not os.path.isfile(str(self.cppfolder) + r'\main.cpp'):
+                    self.display_signal.emit("main.cpp must be in cpp folder...", False)
+                if not os.path.isfile(str(self.cppfolder) + r'\Dockerfile'):
+                    self.display_signal.emit("Dockerfile must be in cpp folder...", False)
+                if not os.path.isfile(str(self.cppfolder) + r'\aphw_unittest.cpp'):
+                    self.display_signal.emit("aphw_unittest.cpp must be in cpp folder...", False)
+                if not os.path.isdir(str(self.cppfolder) + r'\dataset'):
+                    self.display_signal.emit("dataset folder must be in cpp folder...", False)
+
         if os.path.exists(hwpath):
             self.display_signal.emit("Remove or rename hw folder...", False)
         elif os.path.exists(aphwpath):
@@ -161,6 +208,10 @@ class Directory(QtCore.QThread):
             with zipfile.ZipFile(self.aphwfolderpath, 'r') as zip_ref:
                 Path(aphwpath).mkdir(parents=True, exist_ok=True)
                 zip_ref.extractall(aphwpath)
+                for files in os.listdir(aphwpath):
+                    if not os.path.isdir(str(aphwpath) + fr'\{files}'):
+                        self.display_signal.emit("Only folders must be in your zip folder...", False)
+
                 self.create_tree(aphwpath, self.setting_data.file_names, self.cppfolder, self.pythonfolder)
                 shutil.rmtree(aphwpath)
             self.display_signal.emit("End...", True)
@@ -206,6 +257,3 @@ class Directory(QtCore.QThread):
         test_list.append((s, 0))  # the orginal unittest
         # at last we have: testlist = [(test num n, n), (test num n-1, n-1),...(test num 1, 1), (empty namespace, 0), (full test, 0)]
         return test_list
-
-# hw,aphw vojoud ndashte bashe
-# age zaboun pathone adress paython bde age cpp hast adrees cpp bde. kerm narize kolan
