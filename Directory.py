@@ -29,7 +29,7 @@ class Directory(QtCore.QThread):
             if filename[-2:] == '.h' or filename[-4:] == '.hpp' or filename[-4:] == '.cpp':
                 iscpp = True
                 cppfilelist.append(filename)
-        self.display_signal.emit("Trying to unzip all zipped files...", True)
+        self.display_signal.emit("در حال تلاش برای آن زیپ کردن فایل ها", True, False)
         aphwpath = os.path.abspath(s)  # apwh_i path
         hwpath = Path(os.path.abspath(aphwpath)).parent  # our folder path(named hw)
         Path(str(hwpath) + r'\hw').mkdir(parents=True, exist_ok=True)  # create hw in parent of aphw_i
@@ -50,7 +50,7 @@ class Directory(QtCore.QThread):
                                     str(hwpath) + fr'\hw\{student}\CPlusPlus\{ans[:-4]}')  # unzip file in CPlusPlus folder
                                 #                                                            ans[:-4] show the name of sub without the '.zip'
                             except:
-                                self.display_signal.emit(f"Unable to unzip {path}...", False)
+                                self.display_signal.emit(f"{path} ان زیپ نشد.", False, False)
                             
                         if ispython:
                             try:
@@ -58,10 +58,10 @@ class Directory(QtCore.QThread):
                                     str(hwpath) + fr'\hw\{student}\Python\{ans[:-4]}')  # unzip file in Python folder
                                 #                                                         ans[:-4] show the name of sub without the '.zip'
                             except:
-                                self.display_signal.emit(f"Unable to unzip {path}...", False)
+                                self.display_signal.emit(f"{path} ان زیپ نشد.", False, False)
         # now we change dir to 'hw' to create folders to grade easier
-        self.display_signal.emit("All submissions unzipped...", True)
-        self.display_signal.emit("Trying to compute all manners of each submission...", True)
+        self.display_signal.emit("همه ارسال ها ان زیپ شدند.", True, False)
+        self.display_signal.emit("در حال تلاش برای محاسبه تمام حالات و ساخت پوشه های موردنظر.", True, False)
         os.chdir(str(hwpath) + r'\hw')
         for student in os.listdir(
                 os.path.abspath(os.getcwd())):  # name of students are same as the name of students in aphw_i folder
@@ -163,64 +163,64 @@ class Directory(QtCore.QThread):
         aphwpath = Path(str(Path(os.path.abspath(aphwzippath)).parent) + r'\aphw')
         hwpath = Path(str(Path(os.path.abspath(aphwzippath)).parent) + r'\hw')
         if aphwzippath == '':
-            self.display_signal.emit("Enter folder of student's files...", False)                    
+            self.display_signal.emit("فایل تمرین دانشجویان را وارد کنید.", False, True)                    
         
         if not zipfile.is_zipfile(aphwzippath):
-            self.display_signal.emit("Studens'file must be zipped...", False)
+            self.display_signal.emit("فایل تمرین دانشجویان باید حتما زیپ باشد", False, True)
 
         if self.setting_data.file_names == []:
-            self.display_signal.emit("Enter name of files in this homework...", False)  
+            self.display_signal.emit("نام فایل های کد این تمرین را وارد کنید.", False, True)  
 
         for files in self.setting_data.file_names:
             if files[-3:] == '.py':
                 if self.pythonfolder == '':
-                    self.display_signal.emit("Enter python folder path...", False)
+                    self.display_signal.emit("پوشه تصحیح Python را وارد کنید.", False, True)
                 if not os.path.isfile(str(self.pythonfolder) + r'\Makefile'):
-                    self.display_signal.emit("Makefile must be in python folder...", False)
+                    self.display_signal.emit("Makefile باید در پوشه تصحیح Python باشد.", False, True)
                 if not os.path.isfile(str(self.pythonfolder) + r'\requirements.txt'):
-                    self.display_signal.emit("requirements.txt folder must be in python folder...", False)
+                    self.display_signal.emit("requirements.txt باید در پوشه تصحیح Python باشد.", False, True)
                 if not os.path.isfile(str(self.pythonfolder) + r'\Dockerfile'):
-                    self.display_signal.emit("Dockerfile must be in python folder...", False)
+                    self.display_signal.emit("Dockerfile باید در پوشه تصحیح Python باشد.", False, True)
                 if not os.path.isfile(str(self.pythonfolder) + r'\aphw_unittest.py'):
-                    self.display_signal.emit("aphw_unittest.py must be in python folder...", False)
+                    self.display_signal.emit("aphw_unittest.py باید در پوشه تصحیح Python باشد.", False, True)
                 if not os.path.isdir(str(self.pythonfolder) + r'\dataset'):
-                    self.display_signal.emit("dataset folder must be in python folder...", False)
+                    self.display_signal.emit("پوشه dataset باید در پوشه تصحیح Python باشد.", False, True)
 
             if files[-4:] == '.cpp' or files[-4:] == '.hpp' and files[-2:] == '.h':
                 if self.cppfolder == '':
-                    self.display_signal.emit("Enter cpp folder path...", False)   
+                    self.display_signal.emit("پوشه تصحیح C++ را وارد کنید.", False, True)   
                 if not os.path.isfile(str(self.cppfolder) + r'\Makefile'):
-                    self.display_signal.emit("Makefile must be in cpp folder...", False)
+                    self.display_signal.emit("Makefile باید در پوشه تصحیح C++ باشد.", False, True)
                 if not os.path.isfile(str(self.cppfolder) + r'\main.cpp'):
-                    self.display_signal.emit("main.cpp must be in cpp folder...", False)
+                    self.display_signal.emit("main.cpp باید در پوه تصحیح C++ باشد", False, True)
                 if not os.path.isfile(str(self.cppfolder) + r'\Dockerfile'):
-                    self.display_signal.emit("Dockerfile must be in cpp folder...", False)
+                    self.display_signal.emit("Dockerfile باید در پوشه تصحیح C++ باشد.", False, True)
                 if not os.path.isfile(str(self.cppfolder) + r'\aphw_unittest.cpp'):
-                    self.display_signal.emit("aphw_unittest.cpp must be in cpp folder...", False)
+                    self.display_signal.emit("aphw_unittest.cpp باید در پوشه تصحیح C++ باشد.", False, True)
                 if not os.path.isdir(str(self.cppfolder) + r'\dataset'):
-                    self.display_signal.emit("dataset folder must be in cpp folder...", False)
+                    self.display_signal.emit("پوشه dataset باید در پوشه تصحیح C++ باشد.", False, True)
 
         if os.path.exists(hwpath):
-            self.display_signal.emit("Remove or rename hw folder...", False)
+            self.display_signal.emit("نباید پوشه ای با نام hw در کنار فایل زیپ تمرین دانشجویان باشد.", False, True)
         elif os.path.exists(aphwpath):
-            self.display_signal.emit("Remove or rename aphw folder...", False)
+            self.display_signal.emit("نباید پوشه ای با نام aphw در کنار فایل زیپ تمرین دانشجویان باشد.", False, True)
         else:
             with zipfile.ZipFile(self.aphwfolderpath, 'r') as zip_ref:
                 Path(aphwpath).mkdir(parents=True, exist_ok=True)
                 zip_ref.extractall(aphwpath)
                 for files in os.listdir(aphwpath):
                     if not os.path.isdir(str(aphwpath) + fr'\{files}'):
-                        self.display_signal.emit("Only folders must be in your zip folder...", False)
+                        self.display_signal.emit("فایل تمرین دانشجویان فقط باید حاوی تعدادی فولدر باشد.", False, True)
 
                 self.create_tree(aphwpath, self.setting_data.file_names, self.cppfolder, self.pythonfolder)
                 shutil.rmtree(aphwpath)
-            self.display_signal.emit("End...", True)
+            self.display_signal.emit("تمام حالت ها ساخته شد.", True, True)  #finished directory run
 
     def pycomment(self, unittestpath):
         os.chdir(unittestpath)  # path of grading folder
         s = open("aphw_unittest.py").read()
         if s.find("class Test(unittest.TestCase):") == -1:
-            self.display_signal.emit("Please rewrite aphw_unittest.py and run the program again...", False)
+            self.display_signal.emit("لطفا فایل aphw_unittest.py را بازنویسی کنید و دوباره برنامه را ران بگیرید.", False, True)
 
         test_class = s[s.find("class Test(unittest.TestCase):") + 30:s.rfind("if __name__=='__main__':")]  # all test
         temp = test_class
@@ -243,7 +243,7 @@ class Directory(QtCore.QThread):
         os.chdir(unittestpath)  # path of grading folder
         s = open("aphw_unittest.cpp").read()
         if s.find("namespace\n{") == -1:
-            self.display_signal.emit("Please rewrite aphw_unittest.cpp and run the program again...", False)
+            self.display_signal.emit("لطفا فایل aphw_unittest.cpp را بازنویسی کنید و دوباره برنامه را ران بگیرید. ", False, True)
         
         namespace = s[s.find("namespace\n{") + 11:s.rfind("}")]  # all test
         temp = namespace
