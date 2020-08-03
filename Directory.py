@@ -293,6 +293,6 @@ class Directory(QtCore.QThread):
                 ansg += float(minus)
                 s = s.replace(minustr,'')
                 numinus-=1
-            eachtest_grade.append([test_list[i][1], ansg/2])
+            eachtest_grade.append([test_list[i][1], ansg])
         return eachtest_grade
 
