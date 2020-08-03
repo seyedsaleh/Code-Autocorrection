@@ -116,7 +116,7 @@ class cppgrade():
         os.chdir(self.folder_address)
         if not os.path.exists('CPlusPlus'):
             os.chdir(current_path)
-            self.display_signal.emit(f"This student doesn't have any cpp code to grade...", False)
+#             self.display_signal.emit(f"This student doesn't have any cpp code to grade...", False)
             return False
 
         os.chdir('CPlusPlus')
@@ -126,9 +126,9 @@ class cppgrade():
                 count = 1
                 for manner in os.listdir(os.path.abspath(subs)):
                     # print(os.getcwd()+fr'\{subs}\{manner}')
-                    self.display_signal.emit(f"Trying to grade manner {count}...", True)
+#                     self.display_signal.emit(f"Trying to grade manner {count}...", True)
                     f_grade, w_list, i_list, b_list = self.grade_folder(os.getcwd()+fr'\{subs}\{manner}')
-                    self.display_signal.emit(f"Grading manner {count} finished...", True)
+#                     self.display_signal.emit(f"Grading manner {count} finished...", True)
                     count += 1
                     all_output.append([f_grade, w_list, i_list, b_list, os.path.abspath(manner)])
         for i in range(len(all_output)):
@@ -260,7 +260,7 @@ class pygrade():
         os.chdir(self.folder_address)
         if not os.path.exists('Python'):
             os.chdir(current_path)
-            self.display_signal.emit(f"This student doesn't have any python code to grade...", False)
+#             self.display_signal.emit(f"This student doesn't have any python code to grade...", False)
             return False
 
         os.chdir('Python')
@@ -268,9 +268,9 @@ class pygrade():
             if subs[:7] == 'Answer_':
                 count = 1
                 for manner in os.listdir(os.path.abspath(subs)):
-                    self.display_signal.emit(f"Trying to grade manner {count}...", True)
+#                     self.display_signal.emit(f"Trying to grade manner {count}...", True)
                     f_grade, i_list = self.grade_folder(os.getcwd()+fr'\{subs}\{manner}', self.setting_data.python_python)
-                    self.display_signal.emit(f"Grading manner {count} finished...", True)
+#                     self.display_signal.emit(f"Grading manner {count} finished...", True)
                     all_output.append([f_grade, i_list, os.path.abspath(manner)])
         for i in range(len(all_output)):
             if self.final_folder_grade(all_output[i][0]) > self.final_grade:
@@ -351,12 +351,12 @@ class student():
     def run_student(self):          #zaboonesho check konam age cpp bud self.cpp_grade.grading() run konam age python bud self.py_grade.grading()
                                     #zaboonesho check nmiknm vli to func grading aval check miknm python ya cpp hast ya na
         self.pre_process()
-        self.display_signal.emit(f"Start grading {self.eng_name}'s cpp code...", True)
+#         self.display_signal.emit(f"Start grading {self.eng_name}'s cpp code...", True)
         self.cpp_grade.grading()
-        self.display_signal.emit(f"Grading {self.eng_name}'s cpp code finished...", True)
-        self.display_signal.emit(f"Start grading {self.eng_name}'s python code...", True)
+#         self.display_signal.emit(f"Grading {self.eng_name}'s cpp code finished...", True)
+#         self.display_signal.emit(f"Start grading {self.eng_name}'s python code...", True)
         self.python_grade.grading()
-        self.display_signal.emit(f"Grading {self.eng_name}'s python code finished...", True)
+#         self.display_signal.emit(f"Grading {self.eng_name}'s python code finished...", True)
 
 
 if __name__ == "__main__":
