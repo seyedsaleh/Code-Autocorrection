@@ -296,3 +296,37 @@ class Directory(QtCore.QThread):
             eachtest_grade.append([test_list[i][1], ansg])
         return eachtest_grade
 
+    def create_test(self):
+        aphwzippath = os.path.abspath(self.aphwfolderpath)
+        testpath = Path(str(Path(os.path.abspath(aphwzippath)).parent) + r'\test')
+        Path(testpath).mkdir(parents=True, exist_ok=True)
+        shutil.copytree(self.cppfolder, testpath)
+        shutil.copytree(self.pythonfolder, testpath)
+
+    def view(self, s):
+        current = os.getcwd()
+
+        aphwunzipedpath = os.path.abspath(s)
+        viewpath = Path(str(Path(os.path.abspath(aphwunzipedpath)).parent) + r'\s_hw')
+        Path(viewpath).mkdir(parents=True, exist_ok=True)
+        os.chdir(aphwunzipedpath)
+        for student in os.listdir(aphwunzipedpath):
+            for ans in os.listdir(student):
+                path = os.path.abspath(student) + fr'\{ans}'
+                if (zipfile.is_zipfile(path)):  # check the file is zip or not(rar or anything else)
+                                                # if there isn't any zip file, the grade will be zero
+                    with zipfile.ZipFile(path, 'r') as zip_ref:
+                        foldername = ''
+                        for ch in student:
+                            if not(ch>='a' and ch<='z') and not(ch>='A' and ch<='Z') and not(ch>='0' and ch<='9') and ch != '_':
+                                foldername += ch
+                        Path(str(viewpath) + fr'\{foldername}').mkdir(parents=True, exist_ok=True)
+                        try:
+                            zip_ref.extractall(
+                                str(viewpath) + fr'\{foldername}\{ans[:-4]}')  # unzip file in CPlusPlus folder
+                                                                            # ans[:-4] show the name of sub without the '.zip'
+                        except:
+                            print(f"{path} ان زیپ نشد.")
+        os.chdir(current)
+
+
