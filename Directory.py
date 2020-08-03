@@ -263,3 +263,36 @@ class Directory(QtCore.QThread):
         test_list.append((s, 0))  # the orginal unittest
         # at last we have: testlist = [(test num n, n), (test num n-1, n-1),...(test num 1, 1), (empty namespace, 0), (full test, 0)]
         return test_list
+    
+    def cpp_eachtest_grade(self):
+        eachtest_grade = []
+        test_list = self.cppcomment(self.cppfolder+r'\aphw_unittest.cpp')
+        for i in range(len(test_list)-2):
+            ansg = 0
+            numinus = len(re.findall(self.setting_data.minus_keyWord, test_list[i][0]))
+            s = test_list[i][0]
+            while numinus > 0:
+                minustr = s[s.rfind(self.setting_data.minus_keyWord):]
+                minus = re.findall(r'[-+]?\d*\.\d+|\d+', minustr)[0]    #find the grade of each test(EXPECT_EQ)
+                ansg += float(minus)
+                s = s.replace(minustr,'')
+                numinus-=1
+            eachtest_grade.append([test_list[i][1], ansg])
+        return eachtest_grade
+
+    def python_eachtest_grade(self):
+        eachtest_grade = []
+        test_list = self.pycomment(self.pythonfolder+r'\aphw_unittest.py')
+        for i in range(len(test_list)-1):
+            ansg = 0
+            numinus = len(re.findall(self.setting_data.minus_keyWord, test_list[i][0]))
+            s = test_list[i][0]
+            while numinus > 0:
+                minustr = s[s.rfind(self.setting_data.minus_keyWord):]
+                minus = re.findall(r'[-+]?\d*\.\d+|\d+', minustr)[0]    #find the grade of each test(assert_equal)
+                ansg += float(minus)
+                s = s.replace(minustr,'')
+                numinus-=1
+            eachtest_grade.append([test_list[i][1], ansg/2])
+        return eachtest_grade
+
