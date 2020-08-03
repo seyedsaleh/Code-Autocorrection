@@ -216,8 +216,8 @@ class Directory(QtCore.QThread):
                 shutil.rmtree(aphwpath)
             self.display_signal.emit("تمام حالت ها ساخته شد.", True, True)  #finished directory run
 
-    def pycomment(self, unittestpath):
-        os.chdir(unittestpath)  # path of grading folder
+    def pycomment(self):
+        os.chdir(self.pythonfolder)  # path of grading folder
         s = open("aphw_unittest.py").read()
         if s.find("class Test(unittest.TestCase):") == -1:
             self.display_signal.emit("لطفا فایل aphw_unittest.py را بازنویسی کنید و دوباره برنامه را ران بگیرید.", False, True)
@@ -239,8 +239,8 @@ class Directory(QtCore.QThread):
         # at last we have: testlist = [(test num n, n), (test num n-1, n-1),...(test num 1, 1), (full test, 0)]
         return test_list
 
-    def cppcomment(self, unittestpath):
-        os.chdir(unittestpath)  # path of grading folder
+    def cppcomment(self):
+        os.chdir(self.cppfolder)  # path of grading folder
         s = open("aphw_unittest.cpp").read()
         if s.find("namespace\n{") == -1:
             self.display_signal.emit("لطفا فایل aphw_unittest.cpp را بازنویسی کنید و دوباره برنامه را ران بگیرید. ", False, True)
