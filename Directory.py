@@ -302,9 +302,9 @@ class Directory(QtCore.QThread):
         aphwzippath = os.path.abspath(self.aphwfolderpath)
         testpath = Path(str(Path(os.path.abspath(aphwzippath)).parent) + r'\test')
         Path(testpath).mkdir(parents=True, exist_ok=True)
-        shutil.copytree(self.cppfolder, testpath)
-        shutil.copytree(self.pythonfolder, testpath)
-
+        shutil.copytree(self.cppfolder, str(testpath) + r'\cpp')
+        shutil.copytree(self.pythonfolder, str(testpath) + r'\python')
+        
     def view(self, s):
         current = os.getcwd()
 
@@ -328,7 +328,7 @@ class Directory(QtCore.QThread):
                                 str(viewpath) + fr'\{foldername}\{ans[:-4]}')  # unzip file in CPlusPlus folder
                                                                             # ans[:-4] show the name of sub without the '.zip'
                         except:
-                            print(f"{path} ان زیپ نشد.")
+                            self.display_signal.emit(f"{path} ان زیپ نشد.", False, False)
         os.chdir(current)
 
 
