@@ -214,6 +214,7 @@ class Directory(QtCore.QThread):
                     self.display_signal.emit("فایل تمرین دانشجویان فقط باید حاوی تعدادی فولدر باشد.", False, True)
 
             self.view(aphwpath)
+            self.create_test()
             self.create_tree(aphwpath, self.setting_data.file_names, self.cppfolder, self.pythonfolder)
             shutil.rmtree(aphwpath)
             self.display_signal.emit("تمام حالت ها ساخته شد.", True, True)  #finished directory run
