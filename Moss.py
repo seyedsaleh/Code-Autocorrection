@@ -17,15 +17,15 @@ class Moss():
         Path(folder_path).mkdir(parents=True, exist_ok=True)
         for i in range(len(self.students)):
             self.students[i].cpp_grade.moss_id = i
-            Path(folder_path + fr'\{i}').mkdir(parents=True, exist_ok=True)
-            shutil.copytree(self.students[i].cpp_grade.best_path, folder_path + fr'\{i}')
+            Path(folder_path + fr'\mossid_{i}').mkdir(parents=True, exist_ok=True)
+            shutil.copytree(self.students[i].cpp_grade.best_path, folder_path + fr'\mossid_{i}')
         #for python
         folder_path = str(self.mossfolderpath) + r'\mosspython'
         Path(folder_path).mkdir(parents=True, exist_ok=True)
         for i in range(len(self.students)):
             self.students[i].python_grade.moss_id = i
-            Path(folder_path + fr'\{i}').mkdir(parents=True, exist_ok=True)
-            shutil.copytree(self.students[i].cpp_grade.best_path, folder_path + fr'\{i}')
+            Path(folder_path + fr'\mossid_{i}').mkdir(parents=True, exist_ok=True)
+            shutil.copytree(self.students[i].cpp_grade.best_path, folder_path + fr'\mossid_{i}')
 
     def run_moss():
         current = os.getcwd()
