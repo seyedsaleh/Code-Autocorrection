@@ -208,12 +208,14 @@ class Directory(QtCore.QThread):
             with zipfile.ZipFile(self.aphwfolderpath, 'r') as zip_ref:
                 Path(aphwpath).mkdir(parents=True, exist_ok=True)
                 zip_ref.extractall(aphwpath)
-                for files in os.listdir(aphwpath):
-                    if not os.path.isdir(str(aphwpath) + fr'\{files}'):
-                        self.display_signal.emit("فایل تمرین دانشجویان فقط باید حاوی تعدادی فولدر باشد.", False, True)
 
-                self.create_tree(aphwpath, self.setting_data.file_names, self.cppfolder, self.pythonfolder)
-                shutil.rmtree(aphwpath)
+            for files in os.listdir(aphwpath):
+                if not os.path.isdir(str(aphwpath) + fr'\{files}'):
+                    self.display_signal.emit("فایل تمرین دانشجویان فقط باید حاوی تعدادی فولدر باشد.", False, True)
+
+            self.view(aphwpath)
+            self.create_tree(aphwpath, self.setting_data.file_names, self.cppfolder, self.pythonfolder)
+            shutil.rmtree(aphwpath)
             self.display_signal.emit("تمام حالت ها ساخته شد.", True, True)  #finished directory run
 
     def pycomment(self):
